@@ -1,5 +1,7 @@
 from datetime import date
 
+from dateutil.relativedelta import relativedelta
+
 from odoo.exceptions import UserError, ValidationError
 from odoo.tests.common import TransactionCase
 
@@ -89,3 +91,27 @@ class TestRealestate(TransactionCase):
         contact = self.env["res.partner"].create({"name": "Not a Tenant"})
         with self.assertRaises(ValidationError):
             self._create_contract(tenant_id=contact.id)
+
+    def test_cron_generates_all_due_rental_periods(self):
+        today = date.today()
+        contract = self._create_contract(
+            start_date=today.replace(day=1) - relativedelta(months=2),
+            end_date=today,
+        )
+        contract.action_activate()
+
+        invoice_count = self.env["realestate.contract"]._cron_generate_due_invoices()
+
+        self.assertEqual(invoice_count, 3)
+        self.assertEqual(contract.invoice_count, 3)
+        self.assertGreater(contract.next_invoice_date, contract.end_date)
+
+    def test_cron_ignores_future_invoice_dates(self):
+        contract = self._create_contract()
+        contract.action_activate()
+        contract.next_invoice_date = date.today().replace(year=date.today().year + 1)
+
+        invoice_count = self.env["realestate.contract"]._cron_generate_due_invoices()
+
+        self.assertEqual(invoice_count, 0)
+        self.assertFalse(contract.invoice_ids)

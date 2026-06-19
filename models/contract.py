@@ -1,9 +1,13 @@
 from datetime import timedelta
+import logging
 
 from dateutil.relativedelta import relativedelta
 
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError, ValidationError
+
+
+_logger = logging.getLogger(__name__)
 
 
 class RealestateContract(models.Model):
@@ -225,6 +229,37 @@ class RealestateContract(models.Model):
             "view_mode": "form",
             "res_id": invoice.id,
         }
+
+    @api.model
+    def _cron_generate_due_invoices(self):
+        today = fields.Date.context_today(self)
+        contracts = self.search(
+            [
+                ("state", "=", "active"),
+                ("next_invoice_date", "!=", False),
+                ("next_invoice_date", "<=", today),
+            ],
+            order="next_invoice_date, id",
+        )
+        invoice_count = 0
+        for contract in contracts:
+            while (
+                contract.state == "active"
+                and contract.next_invoice_date
+                and contract.next_invoice_date <= today
+                and contract.next_invoice_date <= contract.end_date
+            ):
+                try:
+                    with self.env.cr.savepoint():
+                        contract.action_create_invoice()
+                        invoice_count += 1
+                except Exception:
+                    _logger.exception(
+                        "Unable to generate a due rent invoice for contract %s",
+                        contract.display_name,
+                    )
+                    break
+        return invoice_count
 
     def action_view_invoices(self):
         self.ensure_one()

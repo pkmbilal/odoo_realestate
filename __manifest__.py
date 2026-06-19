@@ -13,6 +13,7 @@
         "security/ir.model.access.csv",
         "data/res_currency_data.xml",
         "data/ir_sequence_data.xml",
+        "data/ir_cron_data.xml",
         "views/property_views.xml",
         "views/tenant_views.xml",
         "views/contract_views.xml",
