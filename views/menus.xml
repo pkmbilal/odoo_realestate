@@ -1,0 +1,19 @@
+<odoo>
+    <record id="action_realestate_rent_product" model="ir.actions.act_window">
+        <field name="name">Rent Products</field>
+        <field name="res_model">product.product</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('detailed_type', '=', 'service')]</field>
+        <field name="context">{'default_detailed_type': 'service', 'default_sale_ok': True, 'default_purchase_ok': False}</field>
+    </record>
+    <menuitem id="menu_realestate_root" name="Realestate" sequence="35" groups="realestate.group_realestate_user" web_icon="realestate,static/description/icon.png"/>
+    <menuitem id="menu_realestate_properties" name="Properties" parent="menu_realestate_root" sequence="10"/>
+    <menuitem id="menu_realestate_buildings" name="Buildings" parent="menu_realestate_properties" action="action_realestate_building" sequence="10"/>
+    <menuitem id="menu_realestate_units" name="Units" parent="menu_realestate_properties" action="action_realestate_unit" sequence="20"/>
+    <menuitem id="menu_realestate_tenants" name="Tenants" parent="menu_realestate_root" action="action_realestate_tenant" sequence="20"/>
+    <menuitem id="menu_realestate_contracts" name="Contracts" parent="menu_realestate_root" action="action_realestate_contract" sequence="30"/>
+    <menuitem id="menu_realestate_invoices" name="Invoices" parent="menu_realestate_root" action="action_realestate_invoice" sequence="40"/>
+    <menuitem id="menu_realestate_configuration" name="Configuration" parent="menu_realestate_root" sequence="90" groups="realestate.group_realestate_manager"/>
+    <menuitem id="menu_realestate_floors" name="Floors" parent="menu_realestate_configuration" action="action_realestate_floor" sequence="10"/>
+    <menuitem id="menu_realestate_rent_products" name="Rent Products" parent="menu_realestate_configuration" action="action_realestate_rent_product" sequence="20"/>
+</odoo>

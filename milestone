@@ -1,0 +1,87 @@
+# Realestate Odoo 18 Community Module Plan
+
+## Summary
+Build a single Odoo Community addon named `realestate` for the CodeSudio real estate ERP. The addon will expose one Odoo app tile named **Realestate**, with internal menus for Properties, Tenants, Contracts, Invoices, Expenses, Reports, and Configuration.
+
+The current scaffold should be renamed from `my_custom_module` to `realestate` so the technical module name matches the requested module name.
+
+## Key Changes
+- Convert the scaffold into a production addon:
+  - Rename addon folder to `realestate`.
+  - Update manifest name, summary, dependencies, app icon metadata, security files, models, views, menus, scheduled actions, and demo cleanup.
+  - Target **Odoo 18 Community**.
+
+- Implement core property management:
+  - Models for buildings, floors, units/rooms, unit history, and maintenance/status tracking.
+  - Unit statuses: available, occupied, maintenance.
+  - Rent amount, deposit amount, building/floor relationship, and active contract linkage.
+
+- Extend tenant management using `res.partner`:
+  - Add tenant flag, Iqama/ID number, emergency contact, document attachment support, VAT/company handling, and rental history access.
+  - Keep tenant accounting data compatible with standard Odoo Contacts and Accounting.
+
+- Implement rental contracts:
+  - Contract model with tenant, unit, rent amount, deposit, payment cycle, start/end dates, next invoice date, state workflow, renewal, termination, and vacating.
+  - Contract states: draft, active, expired, terminated.
+  - Enforce one active contract per unit.
+  - Automatically update unit status when contracts activate or end.
+
+- Implement rent invoicing through standard Accounting:
+  - Depend on `account`.
+  - Generate customer invoices from contracts using standard `account.move`.
+  - Add manual "Create Invoice" button on contracts.
+  - Add scheduled action for automatic due rent invoices.
+  - Support monthly, quarterly, and yearly cycles.
+  - Track generated invoices from each contract.
+
+- Saudi VAT and ZATCA approach:
+  - Configure rent invoice generation to use normal Odoo tax/accounting records, including Saudi 15% VAT where configured.
+  - Do not build custom accounting or tax posting logic.
+  - For ZATCA Phase 2 and QR code requirements, integrate through installed Saudi localization or a certified Community-compatible ZATCA module/configuration; the realestate addon will generate compliant standard invoices but will not reimplement ZATCA cryptographic/compliance logic itself.
+
+- Implement expenses linkage:
+  - Use vendor bills or expense records through standard Accounting.
+  - Add optional building/unit references to expenses/vendor bills where appropriate.
+  - Provide building-wise expense reporting.
+
+- Implement reports and dashboard:
+  - Realestate dashboard as the first screen inside the app.
+  - Dashboard icons/actions for Buildings, Units, Tenants, Contracts, Invoices, Expenses, and Reports.
+  - Reports for rent collection, due/overdue rent, building income, tenant outstanding, expense summary, profit analysis, VAT/accounting handoff.
+
+## Milestones
+1. **MVP Foundation**
+   - Rename addon, manifest, security, menus, app entry.
+   - Build buildings, floors, units, tenants, contracts, unit status logic, manual invoice generation, and basic list/form/search views.
+
+2. **Automation**
+   - Add scheduled rent invoice generation, contract renewal, termination, vacating workflow, invoice history, and tenant rental history.
+
+3. **Accounting + Saudi Setup**
+   - Finalize VAT tax selection, invoice product/account configuration, Saudi localization compatibility, QR/ZATCA integration boundary, and accounting-safe defaults.
+
+4. **Expenses + Reports**
+   - Add building/unit expense links, financial summaries, rent due reports, building-wise income, tenant balances, and profit analysis.
+
+5. **Polish**
+   - Add dashboard, kanban views, smart buttons, access groups, demo data, validation messages, and final install/upgrade testing.
+
+## Test Plan
+- Install the `realestate` addon on Odoo 18 Community.
+- Create building, floor, and units.
+- Create tenants from Contacts and verify tenant-specific fields.
+- Create and activate a contract; verify unit changes to occupied.
+- Attempt a second active contract for the same unit; verify it is blocked.
+- Generate rent invoice manually from a contract.
+- Run scheduled invoice generation and verify only due contracts are invoiced.
+- Terminate/vacate contract and verify unit becomes available.
+- Verify invoices use standard Odoo Accounting, configured rent product, income account, and Saudi 15% VAT tax.
+- Verify dashboard menus/icons open the expected views.
+- Verify access rights for normal internal users.
+
+## Assumptions
+- Target version is **Odoo 18 Community**.
+- The addon technical name must be `realestate`, so the folder should be renamed.
+- There will be one Odoo app tile named **Realestate**, with feature icons/actions inside the app dashboard and menus.
+- Standard Odoo Accounting remains the source of truth for invoices, payments, VAT, credit notes, and reports.
+- ZATCA Phase 2 compliance depends on Saudi localization or a certified compatible ZATCA solution; this addon will integrate with that flow rather than replacing it.

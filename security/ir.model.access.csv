@@ -1,0 +1,11 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_building_user,realestate.building user,model_realestate_building,realestate.group_realestate_user,1,1,1,0
+access_building_manager,realestate.building manager,model_realestate_building,realestate.group_realestate_manager,1,1,1,1
+access_floor_user,realestate.floor user,model_realestate_floor,realestate.group_realestate_user,1,1,1,0
+access_floor_manager,realestate.floor manager,model_realestate_floor,realestate.group_realestate_manager,1,1,1,1
+access_unit_user,realestate.unit user,model_realestate_unit,realestate.group_realestate_user,1,1,1,0
+access_unit_manager,realestate.unit manager,model_realestate_unit,realestate.group_realestate_manager,1,1,1,1
+access_contract_user,realestate.contract user,model_realestate_contract,realestate.group_realestate_user,1,1,1,0
+access_contract_manager,realestate.contract manager,model_realestate_contract,realestate.group_realestate_manager,1,1,1,1
+access_unit_history_user,realestate.unit.history user,model_realestate_unit_history,realestate.group_realestate_user,1,0,0,0
+access_unit_history_manager,realestate.unit.history manager,model_realestate_unit_history,realestate.group_realestate_manager,1,1,1,1

@@ -1,0 +1,19 @@
+<odoo>
+    <record id="view_partner_form_realestate" model="ir.ui.view">
+        <field name="name">res.partner.form.realestate</field><field name="model">res.partner</field><field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_view_realestate_contracts" type="object" class="oe_stat_button" icon="fa-file-text-o" invisible="not is_tenant"><field name="realestate_contract_count" widget="statinfo" string="Rental Contracts"/></button>
+            </xpath>
+            <xpath expr="//field[@name='category_id']" position="after"><field name="is_tenant"/></xpath>
+            <xpath expr="//notebook" position="inside">
+                <page string="Tenant" name="realestate_tenant" invisible="not is_tenant">
+                    <group><group><field name="iqama_id"/><field name="emergency_contact_name"/><field name="emergency_contact_phone"/></group><group><field name="tenant_document_ids" widget="many2many_binary"/></group></group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+    <record id="action_realestate_tenant" model="ir.actions.act_window">
+        <field name="name">Tenants</field><field name="res_model">res.partner</field><field name="view_mode">kanban,tree,form</field><field name="domain">[('is_tenant','=',True)]</field><field name="context">{'default_is_tenant': True, 'search_default_customer': 1}</field>
+    </record>
+</odoo>

@@ -1,0 +1,90 @@
+<odoo>
+    <record id="view_realestate_building_tree" model="ir.ui.view">
+        <field name="name">realestate.building.tree</field>
+        <field name="model">realestate.building</field>
+        <field name="arch" type="xml">
+            <tree decoration-muted="not active">
+                <field name="name"/>
+                <field name="code"/>
+                <field name="active" column_invisible="True"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+                <field name="floor_count"/>
+                <field name="unit_count"/>
+                <field name="available_unit_count"/>
+            </tree>
+        </field>
+    </record>
+    <record id="view_realestate_building_form" model="ir.ui.view">
+        <field name="name">realestate.building.form</field>
+        <field name="model">realestate.building</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button type="object" name="action_view_units" class="oe_stat_button" icon="fa-building-o">
+                            <field name="unit_count" widget="statinfo" string="Units"/>
+                        </button>
+                    </div>
+                    <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger" invisible="active"/>
+                    <div class="oe_title"><label for="name"/><h1><field name="name" placeholder="Building name"/></h1></div>
+                    <group>
+                        <group><field name="code"/><field name="company_id" groups="base.group_multi_company"/></group>
+                        <group><field name="available_unit_count"/><field name="active" invisible="1"/></group>
+                    </group>
+                    <notebook>
+                        <page string="Address"><field name="address" placeholder="Street, city, and location details"/></page>
+                        <page string="Floors">
+                            <field name="floor_ids"><tree editable="bottom"><field name="sequence" widget="handle"/><field name="name"/><field name="unit_count" readonly="1"/></tree></field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+    <record id="view_realestate_building_search" model="ir.ui.view">
+        <field name="name">realestate.building.search</field><field name="model">realestate.building</field>
+        <field name="arch" type="xml"><search><field name="name"/><field name="code"/><field name="company_id" groups="base.group_multi_company"/></search></field>
+    </record>
+    <record id="action_realestate_building" model="ir.actions.act_window">
+        <field name="name">Buildings</field><field name="res_model">realestate.building</field><field name="view_mode">tree,form</field>
+    </record>
+
+    <record id="view_realestate_floor_tree" model="ir.ui.view">
+        <field name="name">realestate.floor.tree</field><field name="model">realestate.floor</field>
+        <field name="arch" type="xml"><tree><field name="sequence" widget="handle"/><field name="name"/><field name="building_id"/><field name="unit_count"/><field name="company_id" groups="base.group_multi_company"/></tree></field>
+    </record>
+    <record id="view_realestate_floor_form" model="ir.ui.view">
+        <field name="name">realestate.floor.form</field><field name="model">realestate.floor</field>
+        <field name="arch" type="xml"><form><sheet><group><field name="name"/><field name="building_id"/><field name="sequence"/></group><field name="unit_ids"><tree><field name="name"/><field name="code"/><field name="unit_type"/><field name="status" widget="badge"/></tree></field></sheet></form></field>
+    </record>
+    <record id="action_realestate_floor" model="ir.actions.act_window">
+        <field name="name">Floors</field><field name="res_model">realestate.floor</field><field name="view_mode">tree,form</field>
+    </record>
+
+    <record id="view_realestate_unit_tree" model="ir.ui.view">
+        <field name="name">realestate.unit.tree</field><field name="model">realestate.unit</field>
+        <field name="arch" type="xml"><tree decoration-success="status == 'available'" decoration-warning="status == 'maintenance'"><field name="name"/><field name="code"/><field name="unit_type"/><field name="building_id"/><field name="floor_id"/><field name="rent_amount"/><field name="currency_id" optional="show"/><field name="status" widget="badge"/><field name="current_contract_id"/></tree></field>
+    </record>
+    <record id="view_realestate_unit_form" model="ir.ui.view">
+        <field name="name">realestate.unit.form</field><field name="model">realestate.unit</field>
+        <field name="arch" type="xml">
+            <form>
+                <header><button name="action_set_maintenance" type="object" string="Set Maintenance" invisible="status != 'available'"/><button name="action_set_available" type="object" string="Mark Available" invisible="status != 'maintenance'"/><field name="status" widget="statusbar" statusbar_visible="available,occupied,maintenance" readonly="1"/></header>
+                <sheet>
+                    <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger" invisible="active"/>
+                    <div class="oe_title"><label for="name"/><h1><field name="name" placeholder="Unit name or number"/></h1></div>
+                    <group><group><field name="code"/><field name="unit_type"/><field name="building_id"/><field name="floor_id" domain="[('building_id', '=', building_id)]"/></group><group><field name="rent_amount"/><field name="deposit_amount"/><field name="currency_id" readonly="1"/><field name="current_contract_id" readonly="1"/><field name="company_id" groups="base.group_multi_company" readonly="1"/><field name="active" invisible="1"/></group></group>
+                    <notebook><page string="Maintenance"><field name="maintenance_notes"/></page><page string="Occupancy History"><field name="history_ids" readonly="1"><tree><field name="tenant_id"/><field name="contract_id"/><field name="start_date"/><field name="end_date"/><field name="status" widget="badge"/></tree></field></page></notebook>
+                </sheet><chatter/>
+            </form>
+        </field>
+    </record>
+    <record id="view_realestate_unit_search" model="ir.ui.view">
+        <field name="name">realestate.unit.search</field><field name="model">realestate.unit</field>
+        <field name="arch" type="xml"><search><field name="name"/><field name="code"/><field name="building_id"/><field name="floor_id"/><filter name="available" string="Available" domain="[('status','=','available')]"/><filter name="occupied" string="Occupied" domain="[('status','=','occupied')]"/><filter name="maintenance" string="Maintenance" domain="[('status','=','maintenance')]"/><group expand="0" string="Group By"><filter name="group_building" string="Building" context="{'group_by':'building_id'}"/><filter name="group_status" string="Status" context="{'group_by':'status'}"/><filter name="group_type" string="Type" context="{'group_by':'unit_type'}"/></group></search></field>
+    </record>
+    <record id="action_realestate_unit" model="ir.actions.act_window">
+        <field name="name">Units</field><field name="res_model">realestate.unit</field><field name="view_mode">tree,form</field>
+    </record>
+</odoo>

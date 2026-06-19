@@ -1,0 +1,132 @@
+<odoo>
+    <record id="product_residential_rent" model="product.product">
+        <field name="name">Residential Rent</field>
+        <field name="detailed_type">service</field>
+        <field name="sale_ok" eval="True"/>
+        <field name="purchase_ok" eval="False"/>
+        <field name="list_price">0</field>
+    </record>
+
+    <record id="building_riyadh_residence" model="realestate.building">
+        <field name="name">Riyadh Residence</field>
+        <field name="code">DEMO-RR</field>
+        <field name="company_id" ref="base.main_company"/>
+        <field name="address">King Fahd Road, Al Olaya, Riyadh</field>
+    </record>
+
+    <record id="floor_riyadh_ground" model="realestate.floor">
+        <field name="name">Ground Floor</field>
+        <field name="sequence">10</field>
+        <field name="building_id" ref="building_riyadh_residence"/>
+    </record>
+    <record id="floor_riyadh_first" model="realestate.floor">
+        <field name="name">First Floor</field>
+        <field name="sequence">20</field>
+        <field name="building_id" ref="building_riyadh_residence"/>
+    </record>
+
+    <record id="unit_riyadh_a101" model="realestate.unit">
+        <field name="name">Apartment A101</field>
+        <field name="code">DEMO-A101</field>
+        <field name="unit_type">flat</field>
+        <field name="building_id" ref="building_riyadh_residence"/>
+        <field name="floor_id" ref="floor_riyadh_ground"/>
+        <field name="rent_amount">4500</field>
+        <field name="deposit_amount">4500</field>
+        <field name="currency_id" ref="base.SAR"/>
+    </record>
+    <record id="unit_riyadh_a102" model="realestate.unit">
+        <field name="name">Apartment A102</field>
+        <field name="code">DEMO-A102</field>
+        <field name="unit_type">flat</field>
+        <field name="building_id" ref="building_riyadh_residence"/>
+        <field name="floor_id" ref="floor_riyadh_ground"/>
+        <field name="rent_amount">3800</field>
+        <field name="deposit_amount">3800</field>
+        <field name="currency_id" ref="base.SAR"/>
+    </record>
+    <record id="unit_riyadh_b201" model="realestate.unit">
+        <field name="name">Apartment B201</field>
+        <field name="code">DEMO-B201</field>
+        <field name="unit_type">flat</field>
+        <field name="building_id" ref="building_riyadh_residence"/>
+        <field name="floor_id" ref="floor_riyadh_first"/>
+        <field name="rent_amount">3200</field>
+        <field name="deposit_amount">3200</field>
+        <field name="currency_id" ref="base.SAR"/>
+        <field name="status">maintenance</field>
+        <field name="maintenance_notes">Air-conditioning service in progress.</field>
+    </record>
+
+    <record id="tenant_ahmed_alqahtani" model="res.partner">
+        <field name="name">Ahmed Alqahtani</field>
+        <field name="is_tenant" eval="True"/>
+        <field name="iqama_id">DEMO-2456789012</field>
+        <field name="mobile">+966 55 123 4567</field>
+        <field name="email">ahmed.tenant@example.com</field>
+        <field name="emergency_contact_name">Khalid Alqahtani</field>
+        <field name="emergency_contact_phone">+966 55 987 6543</field>
+        <field name="company_id" ref="base.main_company"/>
+    </record>
+    <record id="tenant_sara_alharbi" model="res.partner">
+        <field name="name">Sara Alharbi</field>
+        <field name="is_tenant" eval="True"/>
+        <field name="iqama_id">DEMO-2567890123</field>
+        <field name="mobile">+966 54 234 5678</field>
+        <field name="email">sara.tenant@example.com</field>
+        <field name="emergency_contact_name">Noura Alharbi</field>
+        <field name="emergency_contact_phone">+966 54 876 5432</field>
+        <field name="company_id" ref="base.main_company"/>
+    </record>
+
+    <record id="contract_ahmed_active" model="realestate.contract">
+        <field name="tenant_id" ref="tenant_ahmed_alqahtani"/>
+        <field name="unit_id" ref="unit_riyadh_a101"/>
+        <field name="rent_product_id" ref="product_residential_rent"/>
+        <field name="rent_amount">4500</field>
+        <field name="deposit_amount">4500</field>
+        <field name="payment_cycle">quarterly</field>
+        <field name="start_date" eval="(datetime.now() - timedelta(days=30)).strftime('%Y-%m-%d')"/>
+        <field name="end_date" eval="(datetime.now() + timedelta(days=335)).strftime('%Y-%m-%d')"/>
+        <field name="next_invoice_date" eval="(datetime.now() + timedelta(days=60)).strftime('%Y-%m-%d')"/>
+        <field name="state">active</field>
+    </record>
+    <record id="unit_riyadh_a101" model="realestate.unit">
+        <field name="status">occupied</field>
+    </record>
+    <record id="history_ahmed_active" model="realestate.unit.history">
+        <field name="unit_id" ref="unit_riyadh_a101"/>
+        <field name="contract_id" ref="contract_ahmed_active"/>
+        <field name="tenant_id" ref="tenant_ahmed_alqahtani"/>
+        <field name="start_date" eval="(datetime.now() - timedelta(days=30)).strftime('%Y-%m-%d')"/>
+        <field name="status">occupied</field>
+    </record>
+    <record id="contract_ahmed_active" model="realestate.contract">
+        <field name="history_id" ref="history_ahmed_active"/>
+    </record>
+
+    <record id="contract_sara_draft" model="realestate.contract">
+        <field name="tenant_id" ref="tenant_sara_alharbi"/>
+        <field name="unit_id" ref="unit_riyadh_a102"/>
+        <field name="rent_product_id" ref="product_residential_rent"/>
+        <field name="rent_amount">3800</field>
+        <field name="deposit_amount">3800</field>
+        <field name="payment_cycle">monthly</field>
+        <field name="start_date" eval="(datetime.now() + timedelta(days=30)).strftime('%Y-%m-%d')"/>
+        <field name="end_date" eval="(datetime.now() + timedelta(days=395)).strftime('%Y-%m-%d')"/>
+        <field name="next_invoice_date" eval="(datetime.now() + timedelta(days=30)).strftime('%Y-%m-%d')"/>
+    </record>
+
+    <record id="invoice_ahmed_first_quarter" model="account.move">
+        <field name="move_type">out_invoice</field>
+        <field name="partner_id" ref="tenant_ahmed_alqahtani"/>
+        <field name="company_id" ref="base.main_company"/>
+        <field name="currency_id" ref="base.SAR"/>
+        <field name="invoice_date" eval="datetime.now().strftime('%Y-%m-%d')"/>
+        <field name="invoice_origin">Demo quarterly rental</field>
+        <field name="realestate_contract_id" ref="contract_ahmed_active"/>
+        <field name="rental_period_start" eval="(datetime.now() - timedelta(days=30)).strftime('%Y-%m-%d')"/>
+        <field name="rental_period_end" eval="(datetime.now() + timedelta(days=59)).strftime('%Y-%m-%d')"/>
+        <field name="invoice_line_ids" eval="[(0, 0, {'product_id': ref('product_residential_rent'), 'name': 'Quarterly rent - Apartment A101', 'quantity': 1.0, 'price_unit': 13500.0})]"/>
+    </record>
+</odoo>

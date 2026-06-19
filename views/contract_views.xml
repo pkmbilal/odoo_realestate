@@ -1,0 +1,63 @@
+<odoo>
+    <record id="view_realestate_contract_tree" model="ir.ui.view">
+        <field name="name">realestate.contract.tree</field>
+        <field name="model">realestate.contract</field>
+        <field name="arch" type="xml">
+            <tree decoration-success="state == 'active'" decoration-muted="state in ('expired', 'terminated')">
+                <field name="name"/>
+                <field name="tenant_id"/>
+                <field name="unit_id"/>
+                <field name="building_id" optional="show"/>
+                <field name="start_date"/>
+                <field name="end_date"/>
+                <field name="next_invoice_date"/>
+                <field name="rent_amount"/>
+                <field name="currency_id" optional="show"/>
+                <field name="state" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_realestate_contract_form" model="ir.ui.view">
+        <field name="name">realestate.contract.form</field>
+        <field name="model">realestate.contract</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_activate" string="Activate" type="object" class="oe_highlight" invisible="state != 'draft'"/>
+                    <button name="action_create_invoice" string="Create Invoice" type="object" class="oe_highlight" invisible="state != 'active'"/>
+                    <button name="action_vacate" string="Vacate" type="object" confirm="Vacate this unit and close the contract?" invisible="state != 'active'"/>
+                    <button name="action_terminate" string="Terminate" type="object" confirm="Terminate this contract?" invisible="state != 'active'"/>
+                    <button name="action_expire" string="Mark Expired" type="object" invisible="state != 'active'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,active,expired,terminated"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_invoices" type="object" class="oe_stat_button" icon="fa-money"><field name="invoice_count" widget="statinfo" string="Invoices"/></button>
+                    </div>
+                    <div class="oe_title"><label for="name"/><h1><field name="name"/></h1></div>
+                    <group>
+                        <group><field name="tenant_id"/><field name="unit_id"/><field name="building_id" readonly="1"/><field name="company_id" groups="base.group_multi_company" readonly="1"/></group>
+                        <group><field name="start_date"/><field name="end_date"/><field name="payment_cycle"/><field name="next_invoice_date" readonly="state != 'draft'"/></group>
+                    </group>
+                    <notebook>
+                        <page string="Rent and Invoicing">
+                            <group><group><field name="rent_product_id"/><field name="rent_amount" string="Monthly Rent"/><field name="deposit_amount"/><field name="currency_id" readonly="1"/></group><group><field name="termination_date" invisible="not termination_date"/><field name="termination_reason" invisible="state not in ('active', 'terminated')"/></group></group>
+                        </page>
+                        <page string="Invoices"><field name="invoice_ids" readonly="1"><tree><field name="name"/><field name="invoice_date"/><field name="rental_period_start"/><field name="rental_period_end"/><field name="amount_total"/><field name="payment_state" widget="badge"/><field name="state" widget="badge"/></tree></field></page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_realestate_contract_search" model="ir.ui.view">
+        <field name="name">realestate.contract.search</field><field name="model">realestate.contract</field>
+        <field name="arch" type="xml"><search><field name="name"/><field name="tenant_id"/><field name="unit_id"/><field name="building_id"/><filter string="Active" name="active" domain="[('state','=','active')]"/><filter string="Draft" name="draft" domain="[('state','=','draft')]"/><filter string="Closed" name="closed" domain="[('state','in',('expired','terminated'))]"/><group expand="0" string="Group By"><filter name="group_building" string="Building" context="{'group_by':'building_id'}"/><filter name="group_state" string="State" context="{'group_by':'state'}"/><filter name="group_payment_cycle" string="Payment Cycle" context="{'group_by':'payment_cycle'}"/></group></search></field>
+    </record>
+
+    <record id="action_realestate_contract" model="ir.actions.act_window">
+        <field name="name">Rental Contracts</field><field name="res_model">realestate.contract</field><field name="view_mode">tree,form</field>
+    </record>
+</odoo>

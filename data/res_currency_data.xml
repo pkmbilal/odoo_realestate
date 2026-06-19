@@ -1,0 +1,5 @@
+<odoo>
+    <record id="base.SAR" model="res.currency">
+        <field name="active" eval="True"/>
+    </record>
+</odoo>
