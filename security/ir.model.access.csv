@@ -9,3 +9,5 @@ access_contract_user,realestate.contract user,model_realestate_contract,realesta
 access_contract_manager,realestate.contract manager,model_realestate_contract,realestate.group_realestate_manager,1,1,1,1
 access_unit_history_user,realestate.unit.history user,model_realestate_unit_history,realestate.group_realestate_user,1,0,0,0
 access_unit_history_manager,realestate.unit.history manager,model_realestate_unit_history,realestate.group_realestate_manager,1,1,1,1
+access_contract_renewal_wizard_user,realestate.contract.renewal.wizard user,model_realestate_contract_renewal_wizard,realestate.group_realestate_user,1,1,1,1
+access_contract_renewal_wizard_manager,realestate.contract.renewal.wizard manager,model_realestate_contract_renewal_wizard,realestate.group_realestate_manager,1,1,1,1

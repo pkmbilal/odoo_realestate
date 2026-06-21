@@ -17,6 +17,7 @@
         "views/property_views.xml",
         "views/tenant_views.xml",
         "views/contract_views.xml",
+        "views/contract_renewal_views.xml",
         "views/account_move_views.xml",
         "views/res_config_settings_views.xml",
         "views/menus.xml",

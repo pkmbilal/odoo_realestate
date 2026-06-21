@@ -229,3 +229,28 @@ class TestRealestate(TransactionCase):
 
         with self.assertRaises(UserError):
             self.env.company.realestate_commercial_tax_id = other_tax
+
+    def test_contract_renewal_extends_the_active_contract(self):
+        contract = self._create_contract()
+        contract.action_activate()
+
+        wizard = self.env["realestate.contract.renewal.wizard"].with_context(active_id=contract.id).create(
+            {
+                "contract_id": contract.id,
+                "new_end_date": date(2027, 12, 31),
+                "payment_cycle": "yearly",
+                "rent_amount": 1500,
+                "deposit_amount": 750,
+                "next_invoice_date": date(2027, 1, 1),
+                "renewal_notes": "Extended for another term.",
+            }
+        )
+        wizard.action_confirm()
+
+        self.assertEqual(contract.end_date, date(2027, 12, 31))
+        self.assertEqual(contract.renewal_count, 1)
+        self.assertEqual(contract.rent_amount, 1500)
+        self.assertEqual(contract.deposit_amount, 750)
+        self.assertEqual(contract.payment_cycle, "yearly")
+        self.assertEqual(contract.next_invoice_date, date(2027, 1, 1))
+        self.assertEqual(self.unit.status, "occupied")

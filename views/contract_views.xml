@@ -26,6 +26,7 @@
                 <header>
                     <button name="action_activate" string="Activate" type="object" class="oe_highlight" invisible="state != 'draft'"/>
                     <button name="action_create_invoice" string="Create Invoice" type="object" class="oe_highlight" invisible="state != 'active'"/>
+                    <button name="action_open_renewal_wizard" string="Renew" type="object" invisible="state != 'active'"/>
                     <button name="action_vacate" string="Vacate" type="object" confirm="Vacate this unit and close the contract?" invisible="state != 'active'"/>
                     <button name="action_terminate" string="Terminate" type="object" confirm="Terminate this contract?" invisible="state != 'active'"/>
                     <button name="action_expire" string="Mark Expired" type="object" invisible="state != 'active'"/>

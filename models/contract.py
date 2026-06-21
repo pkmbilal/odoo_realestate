@@ -57,6 +57,7 @@ class RealestateContract(models.Model):
     invoice_ids = fields.One2many("account.move", "realestate_contract_id")
     invoice_count = fields.Integer(compute="_compute_invoice_count")
     history_id = fields.Many2one("realestate.unit.history", readonly=True, copy=False)
+    renewal_count = fields.Integer(default=0, readonly=True)
 
     _sql_constraints = [
         ("rent_positive", "check(rent_amount > 0)", "Rent amount must be greater than zero."),
@@ -165,6 +166,19 @@ class RealestateContract(models.Model):
             if contract.end_date > fields.Date.context_today(contract):
                 raise UserError(_("A contract cannot expire before its end date."))
         return self._close_contract("expired", "expired")
+
+    def action_open_renewal_wizard(self):
+        self.ensure_one()
+        if self.state != "active":
+            raise UserError(_("Only active contracts can be renewed."))
+        return {
+            "type": "ir.actions.act_window",
+            "name": _("Renew Contract"),
+            "res_model": "realestate.contract.renewal.wizard",
+            "view_mode": "form",
+            "target": "new",
+            "context": {"active_id": self.id, "default_contract_id": self.id},
+        }
 
     def _next_period_date(self, period_start):
         self.ensure_one()
@@ -295,3 +309,37 @@ class RealestateContract(models.Model):
         action["domain"] = [("realestate_contract_id", "=", self.id)]
         action["context"] = {"default_realestate_contract_id": self.id}
         return action
+
+    def _apply_renewal(self, values):
+        self.ensure_one()
+        if self.state != "active":
+            raise UserError(_("Only active contracts can be renewed."))
+        new_end_date = values.get("new_end_date")
+        if not new_end_date:
+            raise UserError(_("Set a new end date for the renewal."))
+        if new_end_date <= self.end_date:
+            raise UserError(_("The renewal end date must be after the current end date."))
+
+        update_values = {
+            "end_date": new_end_date,
+            "renewal_count": self.renewal_count + 1,
+        }
+        if values.get("rent_amount") is not None:
+            update_values["rent_amount"] = values["rent_amount"]
+        if values.get("deposit_amount") is not None:
+            update_values["deposit_amount"] = values["deposit_amount"]
+        if values.get("payment_cycle"):
+            update_values["payment_cycle"] = values["payment_cycle"]
+        if values.get("next_invoice_date"):
+            update_values["next_invoice_date"] = values["next_invoice_date"]
+
+        self.write(update_values)
+        self.message_post(
+            body=_(
+                "Contract renewed until %(end_date)s. Renewal count is now %(count)s."
+            )
+            % {"end_date": new_end_date, "count": self.renewal_count},
+        )
+        if values.get("renewal_notes"):
+            self.message_post(body=_("Renewal notes: %s") % values["renewal_notes"])
+        return True
