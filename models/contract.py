@@ -194,7 +194,7 @@ class RealestateContract(models.Model):
         period_end = min(next_period - timedelta(days=1), self.end_date)
         cycle_multiplier = {"monthly": 1, "quarterly": 3, "yearly": 12}[self.payment_cycle]
         product = self.rent_product_id.with_company(self.company_id)
-        taxes = product.taxes_id.filtered(lambda tax: tax.company_id == self.company_id)
+        taxes = self._get_rent_taxes()
         invoice = self.env["account.move"].with_company(self.company_id).create(
             {
                 "move_type": "out_invoice",
@@ -212,7 +212,12 @@ class RealestateContract(models.Model):
                         0,
                         {
                             "product_id": product.id,
-                            "name": _("Rent for %(unit)s: %(start)s to %(end)s", unit=self.unit_id.display_name, start=period_start, end=period_end),
+                            "name": _("Rent for %(unit)s: %(start)s to %(end)s")
+                            % {
+                                "unit": self.unit_id.display_name,
+                                "start": period_start,
+                                "end": period_end,
+                            },
                             "quantity": 1.0,
                             "price_unit": self.rent_amount * cycle_multiplier,
                             "tax_ids": [(6, 0, taxes.ids)],
@@ -229,6 +234,29 @@ class RealestateContract(models.Model):
             "view_mode": "form",
             "res_id": invoice.id,
         }
+
+    def _get_rent_taxes(self):
+        self.ensure_one()
+        classification = self.unit_id.tax_classification
+        if not classification:
+            raise UserError(
+                _("Set a residential or commercial tax classification on unit %s before invoicing.")
+                % self.unit_id.display_name
+            )
+        tax = (
+            self.company_id.realestate_residential_tax_id
+            if classification == "residential"
+            else self.company_id.realestate_commercial_tax_id
+        )
+        if not tax:
+            label = _("Residential Exempt Tax") if classification == "residential" else _("Commercial VAT Tax")
+            raise UserError(
+                _("Configure %(tax)s for %(company)s in Realestate settings before invoicing.")
+                % {"tax": label, "company": self.company_id.display_name}
+            )
+        if tax.company_id != self.company_id or tax.type_tax_use != "sale":
+            raise UserError(_("The configured rent tax must be a sales tax belonging to the contract company."))
+        return tax
 
     @api.model
     def _cron_generate_due_invoices(self):

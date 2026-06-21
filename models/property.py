@@ -2,6 +2,47 @@ from odoo import api, fields, models, _
 from odoo.exceptions import ValidationError
 
 
+UNIT_TAX_CLASSIFICATION = {
+    "flat": "residential",
+    "villa": "residential",
+    "duplex": "residential",
+    "residential_floor": "residential",
+    "studio": "residential",
+    "townhouse": "residential",
+    "traditional_house": "residential",
+    "annex": "residential",
+    "room": "residential",
+    "residential_rest_house": "residential",
+    "office": "commercial",
+    "shop": "commercial",
+    "showroom": "commercial",
+    "warehouse": "commercial",
+    "commercial_center": "commercial",
+    "kiosk": "commercial",
+    "commercial_pavilion": "commercial",
+}
+
+UNIT_TYPE_DESCRIPTIONS = {
+    "flat": "Standard multi-room housing unit within a shared residential building.",
+    "villa": "Standalone, independent private house with multiple stories and a courtyard.",
+    "duplex": "Half of a semi-detached building sharing one central dividing wall.",
+    "residential_floor": "An entire isolated level inside a larger residential property leased out on its own.",
+    "studio": "Single open-plan room combining sleeping, cooking, and living spaces.",
+    "townhouse": "A narrow, multi-level attached row house sharing sidewalls with neighboring units.",
+    "traditional_house": "Standard single-story brick or concrete classic home.",
+    "annex": "A self-contained housing structure built atop a villa roof or in a courtyard.",
+    "room": "A single room with shared or private facilities, often used for worker accommodation.",
+    "residential_rest_house": "A family gathering or suburban vacation property leased long-term for residential use.",
+    "office": "Dedicated corporate space, administrative rooms, or an entire office building floor.",
+    "shop": "A street-level retail store, commercial outlet, or space within a shopping strip.",
+    "showroom": "A large commercial space for product displays, car dealerships, or retail galleries.",
+    "warehouse": "A storage facility, fulfillment hub, or inventory yard for commercial goods.",
+    "commercial_center": "A leasable area inside a shopping mall or an entire commercial complex.",
+    "kiosk": "A small standalone commercial stand in a mall, public square, or walkway.",
+    "commercial_pavilion": "An open-air or covered event zone, temporary installation, or commercial courtyard space.",
+}
+
+
 class RealestateBuilding(models.Model):
     _name = "realestate.building"
     _description = "Real Estate Building"
@@ -77,16 +118,35 @@ class RealestateUnit(models.Model):
     active = fields.Boolean(default=True)
     unit_type = fields.Selection(
         [
-            ("flat", "Flat"),
+            ("flat", "Apartment (Flat)"),
+            ("villa", "Villa"),
+            ("duplex", "Duplex"),
+            ("residential_floor", "Floor (Storey)"),
+            ("studio", "Studio"),
+            ("townhouse", "Townhouse"),
+            ("traditional_house", "Traditional House (Bait Sha'abi)"),
+            ("annex", "Annex (Arshia / Rooftop Housing)"),
             ("room", "Room"),
+            ("residential_rest_house", "Residential Rest House (Istiraha)"),
             ("office", "Office"),
-            ("shop", "Shop"),
+            ("shop", "Shop (Retail Unit)"),
+            ("showroom", "Showroom / Exhibition Hall"),
+            ("warehouse", "Warehouse / Logistics Unit"),
+            ("commercial_center", "Commercial Center (Mall)"),
+            ("kiosk", "Kiosk / Booth"),
+            ("commercial_pavilion", "Commercial Pavilion / Space"),
             ("other", "Other"),
         ],
         required=True,
         default="flat",
         tracking=True,
     )
+    tax_classification = fields.Selection(
+        [("residential", "Residential"), ("commercial", "Commercial")],
+        string="Tax Classification",
+        tracking=True,
+    )
+    unit_type_description = fields.Text(compute="_compute_unit_type_description")
     building_id = fields.Many2one(
         "realestate.building", required=True, ondelete="restrict", tracking=True, index=True
     )
@@ -125,6 +185,29 @@ class RealestateUnit(models.Model):
         ("rent_positive", "check(rent_amount > 0)", "Rent amount must be greater than zero."),
         ("deposit_nonnegative", "check(deposit_amount >= 0)", "Deposit amount cannot be negative."),
     ]
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        for values in vals_list:
+            if "tax_classification" not in values:
+                unit_type = values.get("unit_type", "flat")
+                values["tax_classification"] = UNIT_TAX_CLASSIFICATION.get(unit_type)
+        return super().create(vals_list)
+
+    def write(self, values):
+        if "unit_type" in values and "tax_classification" not in values:
+            values["tax_classification"] = UNIT_TAX_CLASSIFICATION.get(values["unit_type"])
+        return super().write(values)
+
+    @api.onchange("unit_type")
+    def _onchange_unit_type(self):
+        self.tax_classification = UNIT_TAX_CLASSIFICATION.get(self.unit_type)
+
+    @api.depends("unit_type")
+    def _compute_unit_type_description(self):
+        for unit in self:
+            description = UNIT_TYPE_DESCRIPTIONS.get(unit.unit_type)
+            unit.unit_type_description = _(description) if description else False
 
     @api.depends("contract_ids.state")
     def _compute_current_contract(self):

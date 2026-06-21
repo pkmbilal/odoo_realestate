@@ -64,7 +64,7 @@
 
     <record id="view_realestate_unit_tree" model="ir.ui.view">
         <field name="name">realestate.unit.tree</field><field name="model">realestate.unit</field>
-        <field name="arch" type="xml"><tree decoration-success="status == 'available'" decoration-warning="status == 'maintenance'"><field name="name"/><field name="code"/><field name="unit_type"/><field name="building_id"/><field name="floor_id"/><field name="rent_amount"/><field name="currency_id" optional="show"/><field name="status" widget="badge"/><field name="current_contract_id"/></tree></field>
+        <field name="arch" type="xml"><tree decoration-success="status == 'available'" decoration-warning="status == 'maintenance'"><field name="name"/><field name="code"/><field name="unit_type"/><field name="tax_classification"/><field name="building_id"/><field name="floor_id"/><field name="rent_amount"/><field name="currency_id" optional="show"/><field name="status" widget="badge"/><field name="current_contract_id"/></tree></field>
     </record>
     <record id="view_realestate_unit_form" model="ir.ui.view">
         <field name="name">realestate.unit.form</field><field name="model">realestate.unit</field>
@@ -74,7 +74,7 @@
                 <sheet>
                     <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger" invisible="active"/>
                     <div class="oe_title"><label for="name"/><h1><field name="name" placeholder="Unit name or number"/></h1></div>
-                    <group><group><field name="code"/><field name="unit_type"/><field name="building_id"/><field name="floor_id" domain="[('building_id', '=', building_id)]"/></group><group><field name="rent_amount"/><field name="deposit_amount"/><field name="currency_id" readonly="1"/><field name="current_contract_id" readonly="1"/><field name="company_id" groups="base.group_multi_company" readonly="1"/><field name="active" invisible="1"/></group></group>
+                    <group><group><field name="code"/><field name="unit_type"/><field name="tax_classification" required="unit_type == 'other'"/><field name="unit_type_description" readonly="1" invisible="not unit_type_description"/><field name="building_id"/><field name="floor_id" domain="[('building_id', '=', building_id)]"/></group><group><field name="rent_amount"/><field name="deposit_amount"/><field name="currency_id" readonly="1"/><field name="current_contract_id" readonly="1"/><field name="company_id" groups="base.group_multi_company" readonly="1"/><field name="active" invisible="1"/></group></group>
                     <notebook><page string="Maintenance"><field name="maintenance_notes"/></page><page string="Occupancy History"><field name="history_ids" readonly="1"><tree><field name="tenant_id"/><field name="contract_id"/><field name="start_date"/><field name="end_date"/><field name="status" widget="badge"/></tree></field></page></notebook>
                 </sheet><chatter/>
             </form>
@@ -82,7 +82,7 @@
     </record>
     <record id="view_realestate_unit_search" model="ir.ui.view">
         <field name="name">realestate.unit.search</field><field name="model">realestate.unit</field>
-        <field name="arch" type="xml"><search><field name="name"/><field name="code"/><field name="building_id"/><field name="floor_id"/><filter name="available" string="Available" domain="[('status','=','available')]"/><filter name="occupied" string="Occupied" domain="[('status','=','occupied')]"/><filter name="maintenance" string="Maintenance" domain="[('status','=','maintenance')]"/><group expand="0" string="Group By"><filter name="group_building" string="Building" context="{'group_by':'building_id'}"/><filter name="group_status" string="Status" context="{'group_by':'status'}"/><filter name="group_type" string="Type" context="{'group_by':'unit_type'}"/></group></search></field>
+        <field name="arch" type="xml"><search><field name="name"/><field name="code"/><field name="building_id"/><field name="floor_id"/><filter name="available" string="Available" domain="[('status','=','available')]"/><filter name="occupied" string="Occupied" domain="[('status','=','occupied')]"/><filter name="maintenance" string="Maintenance" domain="[('status','=','maintenance')]"/><group expand="0" string="Group By"><filter name="group_building" string="Building" context="{'group_by':'building_id'}"/><filter name="group_status" string="Status" context="{'group_by':'status'}"/><filter name="group_type" string="Type" context="{'group_by':'unit_type'}"/><filter name="group_tax_classification" string="Tax Classification" context="{'group_by':'tax_classification'}"/></group></search></field>
     </record>
     <record id="action_realestate_unit" model="ir.actions.act_window">
         <field name="name">Units</field><field name="res_model">realestate.unit</field><field name="view_mode">tree,form</field>

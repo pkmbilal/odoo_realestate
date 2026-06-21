@@ -16,4 +16,5 @@
     <menuitem id="menu_realestate_configuration" name="Configuration" parent="menu_realestate_root" sequence="90" groups="realestate.group_realestate_manager"/>
     <menuitem id="menu_realestate_floors" name="Floors" parent="menu_realestate_configuration" action="action_realestate_floor" sequence="10"/>
     <menuitem id="menu_realestate_rent_products" name="Rent Products" parent="menu_realestate_configuration" action="action_realestate_rent_product" sequence="20"/>
+    <menuitem id="menu_realestate_settings" name="Settings" parent="menu_realestate_configuration" action="action_realestate_settings" sequence="30" groups="base.group_system"/>
 </odoo>
