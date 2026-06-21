@@ -6,7 +6,7 @@
         <field name="domain">[('detailed_type', '=', 'service')]</field>
         <field name="context">{'default_detailed_type': 'service', 'default_sale_ok': True, 'default_purchase_ok': False}</field>
     </record>
-    <menuitem id="menu_realestate_root" name="Realestate" sequence="35" groups="realestate.group_realestate_user" web_icon="realestate,static/description/icon.png"/>
+    <menuitem id="menu_realestate_root" name="Realestate" sequence="35" groups="realestate.group_realestate_user" web_icon="realestate,static/description/icon.png" action="action_realestate_dashboard_open"/>
     <menuitem id="menu_realestate_properties" name="Properties" parent="menu_realestate_root" sequence="10"/>
     <menuitem id="menu_realestate_buildings" name="Buildings" parent="menu_realestate_properties" action="action_realestate_building" sequence="10"/>
     <menuitem id="menu_realestate_units" name="Units" parent="menu_realestate_properties" action="action_realestate_unit" sequence="20"/>

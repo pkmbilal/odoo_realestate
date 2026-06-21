@@ -1,0 +1,83 @@
+<odoo>
+    <record id="view_realestate_dashboard_form" model="ir.ui.view">
+        <field name="name">realestate.dashboard.form</field>
+        <field name="model">realestate.dashboard</field>
+        <field name="arch" type="xml">
+            <form string="Realestate Dashboard" create="false" edit="false" delete="false">
+                <sheet>
+                    <div class="oe_title">
+                        <h1>Realestate Dashboard</h1>
+                        <div class="text-muted">Company: <field name="company_id" readonly="1"/></div>
+                    </div>
+                    <div class="mt16 mb16">
+                        <button type="object" name="action_open_buildings" class="btn btn-primary me-2">Buildings</button>
+                        <button type="object" name="action_open_units" class="btn btn-primary me-2">Units</button>
+                        <button type="object" name="action_open_tenants" class="btn btn-primary me-2">Tenants</button>
+                        <button type="object" name="action_open_contracts" class="btn btn-primary me-2">Contracts</button>
+                        <button type="object" name="action_open_invoices" class="btn btn-primary me-2">Invoices</button>
+                        <button type="object" name="action_open_settings" class="btn btn-secondary" groups="base.group_system">Settings</button>
+                    </div>
+                    <div class="oe_button_box" name="button_box">
+                        <button type="object" name="action_open_buildings" class="oe_stat_button" icon="fa-building">
+                            <field name="building_count" widget="statinfo" string="Buildings"/>
+                        </button>
+                        <button type="object" name="action_open_units" class="oe_stat_button" icon="fa-home">
+                            <field name="unit_count" widget="statinfo" string="Units"/>
+                        </button>
+                        <button type="object" name="action_open_tenants" class="oe_stat_button" icon="fa-user">
+                            <field name="tenant_count" widget="statinfo" string="Tenants"/>
+                        </button>
+                        <button type="object" name="action_open_contracts" class="oe_stat_button" icon="fa-file-text-o">
+                            <field name="active_contract_count" widget="statinfo" string="Contracts"/>
+                        </button>
+                        <button type="object" name="action_open_invoices" class="oe_stat_button" icon="fa-money">
+                            <field name="invoice_due_count" widget="statinfo" string="Invoices"/>
+                        </button>
+                    </div>
+                    <group col="4">
+                        <group string="Occupancy">
+                            <field name="available_unit_count" readonly="1"/>
+                            <field name="occupied_unit_count" readonly="1"/>
+                            <field name="maintenance_unit_count" readonly="1"/>
+                            <button type="object" name="action_open_available_units" string="Open Available Units" class="btn btn-link"/>
+                            <button type="object" name="action_open_occupied_units" string="Open Occupied Units" class="btn btn-link"/>
+                        </group>
+                        <group string="Invoices">
+                            <field name="invoice_due_count" readonly="1"/>
+                            <field name="invoice_overdue_count" readonly="1"/>
+                            <button type="object" name="action_open_due_invoices" string="Open Due Invoices" class="btn btn-link"/>
+                            <button type="object" name="action_open_overdue_invoices" string="Open Overdue Invoices" class="btn btn-link"/>
+                        </group>
+                        <group string="Portfolio">
+                            <field name="building_count" readonly="1"/>
+                            <field name="floor_count" readonly="1"/>
+                            <field name="unit_count" readonly="1"/>
+                            <field name="tenant_count" readonly="1"/>
+                        </group>
+                        <group string="Navigation">
+                            <button type="object" name="action_open_floors" string="Floors" class="btn btn-link"/>
+                            <button type="object" name="action_open_contracts" string="Contracts" class="btn btn-link"/>
+                            <button type="object" name="action_open_invoices" string="Invoices" class="btn btn-link"/>
+                            <button type="object" name="action_open_settings" string="Configuration" class="btn btn-link" groups="base.group_system"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_realestate_dashboard" model="ir.actions.act_window">
+        <field name="name">Realestate Dashboard</field>
+        <field name="res_model">realestate.dashboard</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_realestate_dashboard_form"/>
+        <field name="target">current</field>
+    </record>
+
+    <record id="action_realestate_dashboard_open" model="ir.actions.server">
+        <field name="name">Open Realestate Dashboard</field>
+        <field name="model_id" ref="model_realestate_dashboard"/>
+        <field name="state">code</field>
+        <field name="code">action = env['realestate.dashboard'].action_open_dashboard()</field>
+    </record>
+</odoo>

@@ -254,3 +254,94 @@ class TestRealestate(TransactionCase):
         self.assertEqual(contract.payment_cycle, "yearly")
         self.assertEqual(contract.next_invoice_date, date(2027, 1, 1))
         self.assertEqual(self.unit.status, "occupied")
+
+    def test_dashboard_counts_reflect_portfolio_state(self):
+        dashboard = self.env["realestate.dashboard"].search([("company_id", "=", self.env.company.id)], limit=1)
+
+        self.assertEqual(dashboard.building_count, 1)
+        self.assertEqual(dashboard.floor_count, 1)
+        self.assertEqual(dashboard.unit_count, 1)
+        self.assertEqual(dashboard.available_unit_count, 1)
+        self.assertEqual(dashboard.occupied_unit_count, 0)
+        self.assertEqual(dashboard.maintenance_unit_count, 0)
+        self.assertEqual(dashboard.tenant_count, 1)
+        self.assertEqual(dashboard.active_contract_count, 0)
+
+        contract = self._create_contract()
+        contract.action_activate()
+        dashboard.invalidate_recordset()
+
+        self.assertEqual(dashboard.available_unit_count, 0)
+        self.assertEqual(dashboard.occupied_unit_count, 1)
+        self.assertEqual(dashboard.active_contract_count, 1)
+
+    def test_dashboard_actions_return_expected_domains(self):
+        dashboard = self.env["realestate.dashboard"].search([("company_id", "=", self.env.company.id)], limit=1)
+
+        self.assertEqual(dashboard.action_open_dashboard()["res_id"], dashboard.id)
+        self.assertEqual(
+            dashboard.action_open_available_units()["domain"],
+            [("company_id", "=", self.env.company.id), ("status", "=", "available")],
+        )
+        self.assertEqual(
+            dashboard.action_open_occupied_units()["domain"],
+            [("company_id", "=", self.env.company.id), ("status", "=", "occupied")],
+        )
+        self.assertEqual(
+            dashboard.action_open_active_contracts()["domain"],
+            [("company_id", "=", self.env.company.id), ("state", "=", "active")],
+        )
+        self.assertEqual(
+            dashboard.action_open_overdue_invoices()["domain"],
+            [
+                ("company_id", "=", self.env.company.id),
+                ("realestate_contract_id", "!=", False),
+                ("payment_state", "!=", "paid"),
+                ("state", "!=", "cancel"),
+                ("invoice_date_due", "<", date.today()),
+            ],
+        )
+
+    def test_dashboard_invoice_kpis_split_due_and_overdue(self):
+        dashboard = self.env["realestate.dashboard"].search([("company_id", "=", self.env.company.id)], limit=1)
+        other_building = self.env["realestate.building"].create({"name": "South Tower", "code": "ST"})
+        other_floor = self.env["realestate.floor"].create({"name": "Ground", "building_id": other_building.id})
+        other_unit = self.env["realestate.unit"].create(
+            {
+                "name": "Unit 201",
+                "code": "ST-201",
+                "building_id": other_building.id,
+                "floor_id": other_floor.id,
+                "rent_amount": 2000,
+                "deposit_amount": 500,
+            }
+        )
+        other_tenant = self.env["res.partner"].create({"name": "Second Tenant", "is_tenant": True})
+        second_contract = self.env["realestate.contract"].create(
+            {
+                "tenant_id": other_tenant.id,
+                "unit_id": other_unit.id,
+                "rent_product_id": self.product.id,
+                "rent_amount": 2000,
+                "deposit_amount": 500,
+                "payment_cycle": "monthly",
+                "start_date": date(2026, 1, 1),
+                "end_date": date(2026, 12, 31),
+            }
+        )
+
+        first_contract = self._create_contract()
+        first_contract.action_activate()
+        second_contract.action_activate()
+
+        first_invoice = first_contract.action_create_invoice()
+        second_invoice = second_contract.action_create_invoice()
+        overdue_invoice = self.env["account.move"].browse(first_invoice["res_id"])
+        due_invoice = self.env["account.move"].browse(second_invoice["res_id"])
+        overdue_invoice.write({"invoice_date_due": date.today() - relativedelta(days=3)})
+        due_invoice.write({"invoice_date_due": date.today() + relativedelta(days=3)})
+
+        dashboard.invalidate_recordset()
+
+        self.assertEqual(dashboard.invoice_overdue_count, 1)
+        self.assertEqual(dashboard.invoice_due_count, 1)
