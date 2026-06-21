@@ -3,75 +3,142 @@
         <field name="name">realestate.dashboard.form</field>
         <field name="model">realestate.dashboard</field>
         <field name="arch" type="xml">
-            <form string="Realestate Dashboard" create="false" edit="false" delete="false">
+            <form string="Realestate Dashboard" create="false" edit="false" delete="false" class="o_realestate_dashboard_form">
                 <sheet>
-                    <div class="oe_title">
-                        <h1>Realestate Dashboard</h1>
-                        <div class="text-muted">Company: <field name="company_id" readonly="1"/></div>
+                    <div class="o_realestate_dashboard">
+                        <section class="o_realestate_dashboard_hero">
+                            <div class="o_realestate_dashboard_eyebrow">Portfolio overview</div>
+                            <div class="o_realestate_dashboard_title_row">
+                                <h1 class="o_realestate_dashboard_title">Realestate Dashboard</h1>
+                                <div class="o_realestate_dashboard_company">
+                                    <span>Company</span>
+                                    <field name="company_id" readonly="1"/>
+                                </div>
+                            </div>
+                            <p class="o_realestate_dashboard_subtitle">
+                                Track occupancy, rent flow, and portfolio activity from one operational screen.
+                            </p>
+                        </section>
+
+                        <section class="o_realestate_dashboard_actions" aria-label="Primary navigation">
+                            <button type="object" name="action_open_buildings" class="o_realestate_dashboard_action">
+                                <span class="o_realestate_dashboard_action_label">Properties</span>
+                                <span class="o_realestate_dashboard_action_value"><i class="fa fa-building"/>Buildings</span>
+                            </button>
+                            <button type="object" name="action_open_units" class="o_realestate_dashboard_action">
+                                <span class="o_realestate_dashboard_action_label">Inventory</span>
+                                <span class="o_realestate_dashboard_action_value"><i class="fa fa-home"/>Units</span>
+                            </button>
+                            <button type="object" name="action_open_tenants" class="o_realestate_dashboard_action">
+                                <span class="o_realestate_dashboard_action_label">People</span>
+                                <span class="o_realestate_dashboard_action_value"><i class="fa fa-user"/>Tenants</span>
+                            </button>
+                            <button type="object" name="action_open_contracts" class="o_realestate_dashboard_action">
+                                <span class="o_realestate_dashboard_action_label">Leases</span>
+                                <span class="o_realestate_dashboard_action_value"><i class="fa fa-file-text-o"/>Contracts</span>
+                            </button>
+                            <button type="object" name="action_open_invoices" class="o_realestate_dashboard_action">
+                                <span class="o_realestate_dashboard_action_label">Revenue</span>
+                                <span class="o_realestate_dashboard_action_value"><i class="fa fa-money"/>Invoices</span>
+                            </button>
+                            <button type="object" name="action_open_settings" class="o_realestate_dashboard_action" groups="base.group_system">
+                                <span class="o_realestate_dashboard_action_label">Setup</span>
+                                <span class="o_realestate_dashboard_action_value"><i class="fa fa-cog"/>Settings</span>
+                            </button>
+                        </section>
+
+                        <section class="o_realestate_dashboard_stats">
+                            <button type="object" name="action_open_buildings" class="o_realestate_dashboard_stat o_realestate_dashboard_stat--accent">
+                                <span class="o_realestate_dashboard_stat_title">Buildings <i class="fa fa-building"/></span>
+                                <span class="o_realestate_dashboard_stat_value"><field name="building_count" nolabel="1"/></span>
+                                <span class="o_realestate_dashboard_stat_meta">Managed buildings in the active company</span>
+                            </button>
+                            <button type="object" name="action_open_units" class="o_realestate_dashboard_stat">
+                                <span class="o_realestate_dashboard_stat_title">Units <i class="fa fa-home"/></span>
+                                <span class="o_realestate_dashboard_stat_value"><field name="unit_count" nolabel="1"/></span>
+                                <span class="o_realestate_dashboard_stat_meta">All rentable units and rooms</span>
+                            </button>
+                            <button type="object" name="action_open_active_contracts" class="o_realestate_dashboard_stat">
+                                <span class="o_realestate_dashboard_stat_title">Active contracts <i class="fa fa-file-text-o"/></span>
+                                <span class="o_realestate_dashboard_stat_value"><field name="active_contract_count" nolabel="1"/></span>
+                                <span class="o_realestate_dashboard_stat_meta">Currently running rental agreements</span>
+                            </button>
+                            <button type="object" name="action_open_tenants" class="o_realestate_dashboard_stat">
+                                <span class="o_realestate_dashboard_stat_title">Tenants <i class="fa fa-user"/></span>
+                                <span class="o_realestate_dashboard_stat_value"><field name="tenant_count" nolabel="1"/></span>
+                                <span class="o_realestate_dashboard_stat_meta">Tenant contacts in the portfolio</span>
+                            </button>
+                            <button type="object" name="action_open_due_invoices" class="o_realestate_dashboard_stat">
+                                <span class="o_realestate_dashboard_stat_title">Open invoices <i class="fa fa-money"/></span>
+                                <span class="o_realestate_dashboard_stat_value"><field name="invoice_due_count" nolabel="1"/></span>
+                                <span class="o_realestate_dashboard_stat_meta">Unpaid rent invoices not overdue</span>
+                            </button>
+                        </section>
+
+                        <section class="o_realestate_dashboard_panels">
+                            <div class="o_realestate_dashboard_panel">
+                                <h2>Occupancy</h2>
+                                <div class="row g-3">
+                                    <div class="col-12 col-md-4">
+                                        <div class="o_realestate_dashboard_stat">
+                                            <span class="o_realestate_dashboard_stat_title">Available <i class="fa fa-check-circle"/></span>
+                                            <span class="o_realestate_dashboard_stat_value"><field name="available_unit_count" nolabel="1"/></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-12 col-md-4">
+                                        <div class="o_realestate_dashboard_stat">
+                                            <span class="o_realestate_dashboard_stat_title">Occupied <i class="fa fa-lock"/></span>
+                                            <span class="o_realestate_dashboard_stat_value"><field name="occupied_unit_count" nolabel="1"/></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-12 col-md-4">
+                                        <div class="o_realestate_dashboard_stat">
+                                            <span class="o_realestate_dashboard_stat_title">Maintenance <i class="fa fa-wrench"/></span>
+                                            <span class="o_realestate_dashboard_stat_value"><field name="maintenance_unit_count" nolabel="1"/></span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="o_realestate_dashboard_panel_actions">
+                                    <button type="object" name="action_open_available_units" class="o_realestate_dashboard_link">Available units</button>
+                                    <button type="object" name="action_open_occupied_units" class="o_realestate_dashboard_link">Occupied units</button>
+                                    <button type="object" name="action_open_floors" class="o_realestate_dashboard_link">Floors</button>
+                                </div>
+                            </div>
+
+                            <div class="o_realestate_dashboard_panel">
+                                <h2>Rent Flow</h2>
+                                <div class="row g-3">
+                                    <div class="col-12 col-md-6">
+                                        <div class="o_realestate_dashboard_stat">
+                                            <span class="o_realestate_dashboard_stat_title">Due <i class="fa fa-bell"/></span>
+                                            <span class="o_realestate_dashboard_stat_value"><field name="invoice_due_count" nolabel="1"/></span>
+                                            <span class="o_realestate_dashboard_stat_meta">Ready to collect</span>
+                                        </div>
+                                    </div>
+                                    <div class="col-12 col-md-6">
+                                        <div class="o_realestate_dashboard_stat">
+                                            <span class="o_realestate_dashboard_stat_title">Overdue <i class="fa fa-exclamation-triangle"/></span>
+                                            <span class="o_realestate_dashboard_stat_value"><field name="invoice_overdue_count" nolabel="1"/></span>
+                                            <span class="o_realestate_dashboard_stat_meta">Needs follow-up</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="o_realestate_dashboard_panel_actions">
+                                    <button type="object" name="action_open_due_invoices" class="o_realestate_dashboard_link">Due invoices</button>
+                                    <button type="object" name="action_open_overdue_invoices" class="o_realestate_dashboard_link">Overdue invoices</button>
+                                    <button type="object" name="action_open_contracts" class="o_realestate_dashboard_link">Contracts</button>
+                                </div>
+                            </div>
+                        </section>
                     </div>
-                    <div class="mt16 mb16">
-                        <button type="object" name="action_open_buildings" class="btn btn-primary me-2">Buildings</button>
-                        <button type="object" name="action_open_units" class="btn btn-primary me-2">Units</button>
-                        <button type="object" name="action_open_tenants" class="btn btn-primary me-2">Tenants</button>
-                        <button type="object" name="action_open_contracts" class="btn btn-primary me-2">Contracts</button>
-                        <button type="object" name="action_open_invoices" class="btn btn-primary me-2">Invoices</button>
-                        <button type="object" name="action_open_settings" class="btn btn-secondary" groups="base.group_system">Settings</button>
-                    </div>
-                    <div class="oe_button_box" name="button_box">
-                        <button type="object" name="action_open_buildings" class="oe_stat_button" icon="fa-building">
-                            <field name="building_count" widget="statinfo" string="Buildings"/>
-                        </button>
-                        <button type="object" name="action_open_units" class="oe_stat_button" icon="fa-home">
-                            <field name="unit_count" widget="statinfo" string="Units"/>
-                        </button>
-                        <button type="object" name="action_open_tenants" class="oe_stat_button" icon="fa-user">
-                            <field name="tenant_count" widget="statinfo" string="Tenants"/>
-                        </button>
-                        <button type="object" name="action_open_contracts" class="oe_stat_button" icon="fa-file-text-o">
-                            <field name="active_contract_count" widget="statinfo" string="Contracts"/>
-                        </button>
-                        <button type="object" name="action_open_invoices" class="oe_stat_button" icon="fa-money">
-                            <field name="invoice_due_count" widget="statinfo" string="Invoices"/>
-                        </button>
-                    </div>
-                    <group col="4">
-                        <group string="Occupancy">
-                            <field name="available_unit_count" readonly="1"/>
-                            <field name="occupied_unit_count" readonly="1"/>
-                            <field name="maintenance_unit_count" readonly="1"/>
-                            <button type="object" name="action_open_available_units" string="Open Available Units" class="btn btn-link"/>
-                            <button type="object" name="action_open_occupied_units" string="Open Occupied Units" class="btn btn-link"/>
-                        </group>
-                        <group string="Invoices">
-                            <field name="invoice_due_count" readonly="1"/>
-                            <field name="invoice_overdue_count" readonly="1"/>
-                            <button type="object" name="action_open_due_invoices" string="Open Due Invoices" class="btn btn-link"/>
-                            <button type="object" name="action_open_overdue_invoices" string="Open Overdue Invoices" class="btn btn-link"/>
-                        </group>
-                        <group string="Portfolio">
-                            <field name="building_count" readonly="1"/>
-                            <field name="floor_count" readonly="1"/>
-                            <field name="unit_count" readonly="1"/>
-                            <field name="tenant_count" readonly="1"/>
-                        </group>
-                        <group string="Navigation">
-                            <button type="object" name="action_open_floors" string="Floors" class="btn btn-link"/>
-                            <button type="object" name="action_open_contracts" string="Contracts" class="btn btn-link"/>
-                            <button type="object" name="action_open_invoices" string="Invoices" class="btn btn-link"/>
-                            <button type="object" name="action_open_settings" string="Configuration" class="btn btn-link" groups="base.group_system"/>
-                        </group>
-                    </group>
                 </sheet>
             </form>
         </field>
     </record>
 
-    <record id="action_realestate_dashboard" model="ir.actions.act_window">
+    <record id="action_realestate_dashboard_client" model="ir.actions.client">
         <field name="name">Realestate Dashboard</field>
-        <field name="res_model">realestate.dashboard</field>
-        <field name="view_mode">form</field>
-        <field name="view_id" ref="view_realestate_dashboard_form"/>
-        <field name="target">current</field>
+        <field name="tag">realestate_dashboard</field>
     </record>
 
     <record id="action_realestate_dashboard_open" model="ir.actions.server">

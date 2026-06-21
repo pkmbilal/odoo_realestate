@@ -80,10 +80,14 @@ class RealestateDashboard(models.Model):
         dashboard = self.search([("company_id", "=", self.env.company.id)], limit=1)
         if not dashboard:
             dashboard = self.create({"company_id": self.env.company.id})
-        action = self.env["ir.actions.actions"]._for_xml_id("realestate.action_realestate_dashboard")
-        action["res_id"] = dashboard.id
-        action["target"] = "current"
-        return action
+        return {
+            "type": "ir.actions.client",
+            "tag": "realestate_dashboard",
+            "name": "Realestate Dashboard",
+            "params": {
+                "dashboard_id": dashboard.id,
+            },
+        }
 
     def _open_action(self, xmlid, domain=None, context=None):
         self.ensure_one()

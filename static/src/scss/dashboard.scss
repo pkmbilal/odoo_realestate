@@ -1,0 +1,346 @@
+.o_realestate_dashboard_form,
+.o_realestate_dashboard_app {
+  --re-bg: #ffffff;
+  --re-surface: #ffffff;
+  --re-surface-soft: #fbfcfe;
+  --re-ink: #163049;
+  --re-muted: #6b7a90;
+  --re-accent: #1f6feb;
+  --re-accent-2: #18a999;
+  --re-border: rgba(22, 48, 73, 0.08);
+  --re-shadow: 0 16px 34px rgba(22, 48, 73, 0.06);
+  --re-shadow-soft: 0 8px 20px rgba(22, 48, 73, 0.04);
+  --re-radius-lg: 24px;
+  --re-radius-md: 18px;
+  --re-radius-sm: 14px;
+
+  color: var(--re-ink);
+  background:
+    linear-gradient(180deg, #ffffff 0%, #fbfcfe 100%);
+}
+
+.o_realestate_dashboard_form {
+  .o_form_sheet_bg {
+    width: 100%;
+    background: transparent;
+    padding: 0 !important;
+    display: block;
+    margin: 0;
+  }
+
+  .o_form_sheet {
+    max-width: 100% !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: transparent;
+    border: 0;
+    box-shadow: none;
+  }
+}
+
+.o_realestate_dashboard_app {
+  min-height: 100%;
+  width: 100%;
+
+  .o_realestate_dashboard_loading,
+  .o_realestate_dashboard_error {
+    margin: 1rem;
+  }
+
+  .o_realestate_dashboard_loading {
+    min-height: calc(100vh - 10rem);
+    display: grid;
+    place-items: center;
+    padding: 1rem;
+  }
+
+  .o_realestate_dashboard_loading_card {
+    min-width: 14rem;
+    text-align: center;
+    color: var(--re-muted);
+    font-weight: 600;
+    padding: 1rem 1.25rem;
+    border-radius: var(--re-radius-md);
+    border: 1px solid var(--re-border);
+    background: #ffffff;
+    box-shadow: var(--re-shadow-soft);
+  }
+
+  .o_realestate_dashboard {
+    padding: 1.25rem;
+    display: grid;
+    gap: 1rem;
+  }
+
+  .o_realestate_dashboard_hero {
+    position: relative;
+    overflow: hidden;
+    color: var(--re-ink);
+    border-radius: var(--re-radius-lg);
+    padding: 1.5rem 1.5rem 1.25rem;
+    box-shadow: var(--re-shadow);
+    background:
+      linear-gradient(180deg, #ffffff 0%, #fbfcfe 100%);
+    border: 1px solid var(--re-border);
+  }
+
+  .o_realestate_dashboard_hero::after {
+    content: "";
+    position: absolute;
+    inset: auto -8% -40% auto;
+    width: 18rem;
+    height: 18rem;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(31, 111, 235, 0.06), transparent 68%);
+    filter: blur(2px);
+    pointer-events: none;
+  }
+
+  .o_realestate_dashboard_eyebrow {
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    font-size: 0.72rem;
+    color: var(--re-accent);
+    margin-bottom: 0.4rem;
+  }
+
+  .o_realestate_dashboard_title_row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .o_realestate_dashboard_title {
+    margin: 0;
+    font-size: clamp(1.7rem, 2.8vw, 2.6rem);
+    line-height: 1.05;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+  }
+
+  .o_realestate_dashboard_company {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.55rem 0.8rem;
+    border-radius: 999px;
+    background: #ffffff;
+    border: 1px solid var(--re-border);
+  }
+
+  .o_realestate_dashboard_subtitle {
+    max-width: 46rem;
+    margin: 0.7rem 0 0;
+    color: var(--re-muted);
+    font-size: 0.98rem;
+  }
+
+  .o_realestate_dashboard_actions {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 0.75rem;
+  }
+
+  .o_realestate_dashboard_action {
+    min-height: 5.6rem;
+    padding: 0.9rem 1rem;
+    border: 1px solid var(--re-border);
+    border-radius: var(--re-radius-md);
+    background: var(--re-surface);
+    box-shadow: var(--re-shadow-soft);
+    color: var(--re-ink);
+    text-align: left;
+    transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease;
+  }
+
+  .o_realestate_dashboard_action:hover,
+  .o_realestate_dashboard_action:focus-visible {
+    transform: translateY(-2px);
+    border-color: rgba(31, 111, 235, 0.22);
+    box-shadow: 0 18px 32px rgba(22, 48, 73, 0.10);
+  }
+
+  .o_realestate_dashboard_action_label {
+    display: block;
+    font-size: 0.76rem;
+    letter-spacing: 0.11em;
+    text-transform: uppercase;
+    color: var(--re-muted);
+    margin-bottom: 0.3rem;
+  }
+
+  .o_realestate_dashboard_action_value {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    font-size: 1rem;
+    font-weight: 700;
+  }
+
+  .o_realestate_dashboard_action_value i {
+    font-size: 1rem;
+    width: 1.9rem;
+    height: 1.9rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.7rem;
+    color: #fff;
+    background: linear-gradient(135deg, var(--re-accent), var(--re-accent-2));
+  }
+
+  .o_realestate_dashboard_stats {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 0.85rem;
+  }
+
+  .o_realestate_dashboard_stat {
+    position: relative;
+    overflow: hidden;
+    min-height: 8.8rem;
+    border-radius: var(--re-radius-md);
+    border: 1px solid var(--re-border);
+    background: var(--re-surface);
+    box-shadow: var(--re-shadow-soft);
+    padding: 1rem;
+    color: var(--re-ink);
+    width: 100%;
+  }
+
+  .o_realestate_dashboard_stat--accent {
+    background:
+      linear-gradient(180deg, #ffffff, #fbfcfe),
+      var(--re-surface);
+  }
+
+  .o_realestate_dashboard_stat::after {
+    content: "";
+    position: absolute;
+    inset: auto -1rem -1rem auto;
+    width: 5.5rem;
+    height: 5.5rem;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(31, 111, 235, 0.10), transparent 68%);
+    pointer-events: none;
+  }
+
+  .o_realestate_dashboard_stat_title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    color: var(--re-muted);
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 0.9rem;
+  }
+
+  .o_realestate_dashboard_stat_value {
+    font-size: 2rem;
+    line-height: 1;
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    color: var(--re-ink);
+  }
+
+  .o_realestate_dashboard_stat_meta {
+    display: block;
+    margin-top: 0.4rem;
+    color: var(--re-muted);
+    font-size: 0.86rem;
+  }
+
+  .o_realestate_dashboard_panels {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.85rem;
+  }
+
+  .o_realestate_dashboard_panel {
+    border-radius: var(--re-radius-md);
+    border: 1px solid var(--re-border);
+    background: var(--re-surface);
+    box-shadow: var(--re-shadow-soft);
+    padding: 1rem 1rem 0.9rem;
+  }
+
+  .o_realestate_dashboard_panel h2 {
+    margin: 0 0 0.85rem;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--re-ink);
+  }
+
+  .o_realestate_dashboard_panel .o_field_widget {
+    font-weight: 600;
+    color: var(--re-ink);
+  }
+
+  .o_realestate_dashboard_panel_actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.8rem;
+  }
+
+  .o_realestate_dashboard_link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    border-radius: 999px;
+    border: 1px solid rgba(31, 111, 235, 0.16);
+    background: linear-gradient(180deg, #ffffff, #f8fbff);
+    color: var(--re-accent);
+    padding: 0.5rem 0.8rem;
+    font-weight: 700;
+  }
+
+  .o_realestate_dashboard_link:hover,
+  .o_realestate_dashboard_link:focus-visible {
+    border-color: rgba(31, 111, 235, 0.32);
+    background: #fff;
+  }
+
+  @media (max-width: 1200px) {
+    .o_realestate_dashboard_actions {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .o_realestate_dashboard_stats {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 768px) {
+    .o_realestate_dashboard {
+      padding: 0.75rem;
+    }
+
+    .o_realestate_dashboard_actions,
+    .o_realestate_dashboard_stats,
+    .o_realestate_dashboard_panels {
+      grid-template-columns: 1fr;
+    }
+
+    .o_realestate_dashboard_title_row {
+      align-items: flex-start;
+    }
+
+    .o_realestate_dashboard_action,
+    .o_realestate_dashboard_stat,
+    .o_realestate_dashboard_panel {
+      min-height: unset;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .o_realestate_dashboard_action {
+      transition: none;
+    }
+  }
+}

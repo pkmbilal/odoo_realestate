@@ -23,6 +23,13 @@
         "views/res_config_settings_views.xml",
         "views/menus.xml",
     ],
+    "assets": {
+        "web.assets_backend": [
+            "realestate/static/src/js/dashboard_action.js",
+            "realestate/static/src/xml/dashboard.xml",
+            "realestate/static/src/scss/dashboard.scss",
+        ],
+    },
     "demo": ["demo/realestate_demo.xml"],
     "application": True,
     "installable": True,
