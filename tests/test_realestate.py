@@ -345,3 +345,97 @@ class TestRealestate(TransactionCase):
 
         self.assertEqual(dashboard.invoice_overdue_count, 1)
         self.assertEqual(dashboard.invoice_due_count, 1)
+
+    def test_vendor_bill_expense_metadata_defaults_building_from_unit(self):
+        vendor = self.env["res.partner"].create({"name": "Maintenance Vendor", "supplier_rank": 1})
+        bill = self.env["account.move"].create(
+            {
+                "move_type": "in_invoice",
+                "partner_id": vendor.id,
+                "invoice_date": date.today(),
+                "realestate_expense_category": "maintenance",
+                "realestate_expense_unit_id": self.unit.id,
+                "invoice_line_ids": [
+                    (
+                        0,
+                        0,
+                        {
+                            "name": "Minor repair work",
+                            "product_id": self.product.id,
+                            "quantity": 1.0,
+                            "price_unit": 250,
+                        },
+                    )
+                ],
+            }
+        )
+
+        self.assertEqual(bill.realestate_expense_building_id, self.building)
+        self.assertEqual(bill.realestate_expense_unit_id, self.unit)
+        self.assertEqual(bill.realestate_expense_category, "maintenance")
+
+        dashboard = self.env["realestate.dashboard"].search([("company_id", "=", self.env.company.id)], limit=1)
+        dashboard.invalidate_recordset()
+
+        self.assertEqual(dashboard.expense_bill_count, 1)
+        self.assertEqual(dashboard.expense_month_total, 250)
+
+    def test_mismatched_expense_building_and_unit_is_rejected(self):
+        vendor = self.env["res.partner"].create({"name": "Utilities Vendor", "supplier_rank": 1})
+        other_building = self.env["realestate.building"].create({"name": "East Tower", "code": "ET"})
+        other_floor = self.env["realestate.floor"].create({"name": "Ground", "building_id": other_building.id})
+        other_unit = self.env["realestate.unit"].create(
+            {
+                "name": "Unit 301",
+                "code": "ET-301",
+                "building_id": other_building.id,
+                "floor_id": other_floor.id,
+                "rent_amount": 1500,
+                "deposit_amount": 500,
+            }
+        )
+
+        with self.assertRaises(ValidationError):
+            self.env["account.move"].create(
+                {
+                    "move_type": "in_invoice",
+                    "partner_id": vendor.id,
+                    "invoice_date": date.today(),
+                    "realestate_expense_category": "utilities",
+                    "realestate_expense_building_id": self.building.id,
+                    "realestate_expense_unit_id": other_unit.id,
+                    "invoice_line_ids": [
+                        (
+                            0,
+                            0,
+                            {
+                                "name": "Power bill",
+                                "product_id": self.product.id,
+                                "quantity": 1.0,
+                                "price_unit": 300,
+                            },
+                        )
+                    ],
+                }
+            )
+
+    def test_expense_actions_open_vendor_bills_and_reports(self):
+        dashboard = self.env["realestate.dashboard"].search([("company_id", "=", self.env.company.id)], limit=1)
+
+        self.assertEqual(
+            dashboard.action_open_expenses()["domain"],
+            [("company_id", "=", self.env.company.id), ("move_type", "in", ("in_invoice", "in_refund"))],
+        )
+        self.assertEqual(
+            dashboard.action_open_expense_reports()["domain"],
+            [
+                ("company_id", "=", self.env.company.id),
+                ("move_type", "in", ("in_invoice", "in_refund")),
+                ("state", "!=", "cancel"),
+                "|",
+                "|",
+                ("realestate_expense_category", "!=", False),
+                ("realestate_expense_building_id", "!=", False),
+                ("realestate_expense_unit_id", "!=", False),
+            ],
+        )

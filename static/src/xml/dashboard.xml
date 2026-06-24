@@ -139,6 +139,7 @@
                                 <button type="button" t-on-click="openContracts" class="o_realestate_dashboard_link">Contracts</button>
                             </div>
                         </div>
+
                     </section>
                 </div>
             </t>

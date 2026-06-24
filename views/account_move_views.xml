@@ -1,15 +1,121 @@
 <odoo>
     <record id="view_move_form_realestate" model="ir.ui.view">
-        <field name="name">account.move.form.realestate</field><field name="model">account.move</field><field name="inherit_id" ref="account.view_move_form"/>
+        <field name="name">account.move.form.realestate</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='invoice_origin']" position="after">
                 <field name="realestate_contract_id" invisible="move_type not in ('out_invoice', 'out_refund')"/>
                 <field name="rental_period_start" invisible="not realestate_contract_id"/>
                 <field name="rental_period_end" invisible="not realestate_contract_id"/>
             </xpath>
+            <xpath expr="//sheet//notebook" position="inside">
+                <page string="Realestate Expense" invisible="move_type not in ('in_invoice', 'in_refund')">
+                    <group>
+                        <group>
+                            <field name="realestate_expense_category"/>
+                            <field name="realestate_expense_building_id"/>
+                        </group>
+                        <group>
+                            <field name="realestate_expense_unit_id" domain="[('building_id', '=', realestate_expense_building_id)]"/>
+                        </group>
+                    </group>
+                </page>
+            </xpath>
         </field>
     </record>
+
+    <record id="view_realestate_expense_tree" model="ir.ui.view">
+        <field name="name">account.move.tree.realestate.expense</field>
+        <field name="model">account.move</field>
+        <field name="arch" type="xml">
+            <tree decoration-muted="state == 'cancel'" decoration-info="move_type == 'in_refund'">
+                <field name="move_type" column_invisible="True"/>
+                <field name="name"/>
+                <field name="invoice_date"/>
+                <field name="partner_id"/>
+                <field name="realestate_expense_category"/>
+                <field name="realestate_expense_building_id"/>
+                <field name="realestate_expense_unit_id"/>
+                <field name="realestate_expense_amount"/>
+                <field name="payment_state" widget="badge"/>
+                <field name="state" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_realestate_expense_search" model="ir.ui.view">
+        <field name="name">account.move.search.realestate.expense</field>
+        <field name="model">account.move</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="realestate_expense_category"/>
+                <field name="realestate_expense_building_id"/>
+                <field name="realestate_expense_unit_id"/>
+                <filter string="Tagged Expenses" name="realestate_expense_tagged" domain="['|','|',('realestate_expense_category','!=',False),('realestate_expense_building_id','!=',False),('realestate_expense_unit_id','!=',False)]"/>
+                <filter string="Unpaid" name="expense_unpaid" domain="[('payment_state', '!=', 'paid')]"/>
+                <filter string="Posted" name="expense_posted" domain="[('state', '=', 'posted')]"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_building" string="Building" context="{'group_by': 'realestate_expense_building_id'}"/>
+                    <filter name="group_unit" string="Unit" context="{'group_by': 'realestate_expense_unit_id'}"/>
+                    <filter name="group_category" string="Category" context="{'group_by': 'realestate_expense_category'}"/>
+                    <filter name="group_month" string="Month" context="{'group_by': 'invoice_date:month'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="view_realestate_expense_graph" model="ir.ui.view">
+        <field name="name">account.move.graph.realestate.expense</field>
+        <field name="model">account.move</field>
+        <field name="arch" type="xml">
+            <graph string="Expense Analysis" type="bar">
+                <field name="realestate_expense_category" type="row"/>
+                <field name="realestate_expense_building_id" type="col"/>
+                <field name="realestate_expense_amount" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="view_realestate_expense_pivot" model="ir.ui.view">
+        <field name="name">account.move.pivot.realestate.expense</field>
+        <field name="model">account.move</field>
+        <field name="arch" type="xml">
+            <pivot string="Expense Analysis">
+                <field name="realestate_expense_category" type="row"/>
+                <field name="realestate_expense_building_id" type="col"/>
+                <field name="realestate_expense_amount" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="action_realestate_expense_bill" model="ir.actions.act_window">
+        <field name="name">Expense Bills</field>
+        <field name="res_model">account.move</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="view_realestate_expense_tree"/>
+        <field name="search_view_id" ref="view_realestate_expense_search"/>
+        <field name="domain">[('move_type', 'in', ('in_invoice', 'in_refund'))]</field>
+        <field name="context">{'default_move_type': 'in_invoice'}</field>
+    </record>
+
+    <record id="action_realestate_expense_report" model="ir.actions.act_window">
+        <field name="name">Expense Analysis</field>
+        <field name="res_model">account.move</field>
+        <field name="view_mode">graph,pivot,tree,form</field>
+        <field name="view_id" ref="view_realestate_expense_graph"/>
+        <field name="search_view_id" ref="view_realestate_expense_search"/>
+        <field name="domain">[('move_type', 'in', ('in_invoice', 'in_refund')), ('state', '!=', 'cancel'), '|', '|', ('realestate_expense_category', '!=', False), ('realestate_expense_building_id', '!=', False), ('realestate_expense_unit_id', '!=', False)]</field>
+        <field name="context">{'default_move_type': 'in_invoice', 'search_default_realestate_expense_tagged': 1, 'search_default_expense_posted': 1}</field>
+    </record>
+
     <record id="action_realestate_invoice" model="ir.actions.act_window">
-        <field name="name">Rent Invoices</field><field name="res_model">account.move</field><field name="view_mode">tree,form</field><field name="domain">[('realestate_contract_id','!=',False),('move_type','=','out_invoice')]</field><field name="context">{'default_move_type':'out_invoice'}</field>
+        <field name="name">Rent Invoices</field>
+        <field name="res_model">account.move</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('realestate_contract_id','!=',False),('move_type','=','out_invoice')]</field>
+        <field name="context">{'default_move_type':'out_invoice'}</field>
     </record>
 </odoo>
