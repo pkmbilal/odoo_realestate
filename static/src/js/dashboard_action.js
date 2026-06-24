@@ -112,8 +112,22 @@ class RealestateDashboardAction extends Component {
         return this._runDashboardAction("action_open_active_contracts");
     }
 
-    openInvoices() {
-        return this._runDashboardAction("action_open_invoices");
+    async openInvoices() {
+        if (!this.dashboard.id) {
+            return;
+        }
+        try {
+            const route = await this.orm.call("realestate.dashboard", "action_open_invoices", [[this.dashboard.id]]);
+            if (!route?.action_id || !route?.menu_id) {
+                return this._runDashboardAction("action_open_invoices");
+            }
+            const model = route.model || "account.move";
+            const viewType = route.view_type || "list";
+            window.location.hash = `action=${route.action_id}&model=${encodeURIComponent(model)}&view_type=${viewType}&menu_id=${route.menu_id}`;
+        } catch (error) {
+            const message = error?.message || "Unable to open the requested view.";
+            this.notification.add(message, { type: "danger" });
+        }
     }
 
     openDueInvoices() {

@@ -161,15 +161,19 @@ class RealestateDashboard(models.Model):
 
     def action_open_invoices(self):
         self.ensure_one()
-        return self._open_action(
-            "realestate.action_realestate_invoice",
-            [("company_id", "=", self.company_id.id), ("realestate_contract_id", "!=", False)],
-        )
+        menu = self.env.ref("realestate.menu_realestate_invoices")
+        action = menu.action
+        return {
+            "action_id": action.id,
+            "menu_id": menu.id,
+            "model": action.res_model,
+            "view_type": "list",
+        }
 
     def action_open_due_invoices(self):
         self.ensure_one()
         today = fields.Date.context_today(self)
-        return self._open_action(
+        action = self._open_action(
             "realestate.action_realestate_invoice",
             [
                 ("company_id", "=", self.company_id.id),
@@ -181,11 +185,13 @@ class RealestateDashboard(models.Model):
                 ("invoice_date_due", ">=", today),
             ],
         )
+        action["menu_id"] = self.env.ref("realestate.menu_realestate_invoices").id
+        return action
 
     def action_open_overdue_invoices(self):
         self.ensure_one()
         today = fields.Date.context_today(self)
-        return self._open_action(
+        action = self._open_action(
             "realestate.action_realestate_invoice",
             [
                 ("company_id", "=", self.company_id.id),
@@ -195,6 +201,8 @@ class RealestateDashboard(models.Model):
                 ("invoice_date_due", "<", today),
             ],
         )
+        action["menu_id"] = self.env.ref("realestate.menu_realestate_invoices").id
+        return action
 
     def action_open_settings(self):
         self.ensure_one()
