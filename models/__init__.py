@@ -5,3 +5,4 @@ from . import contract_renewal_wizard
 from . import dashboard
 from . import account_move
 from . import res_company
+from . import financial_report

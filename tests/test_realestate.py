@@ -439,3 +439,62 @@ class TestRealestate(TransactionCase):
                 ("realestate_expense_unit_id", "!=", False),
             ],
         )
+
+    def test_financial_report_combines_income_and_expenses(self):
+        contract = self._create_contract()
+        contract.action_activate()
+        invoice_action = contract.action_create_invoice()
+        invoice = self.env["account.move"].browse(invoice_action["res_id"])
+
+        vendor = self.env["res.partner"].create({"name": "Cleaning Vendor", "supplier_rank": 1})
+        bill = self.env["account.move"].create(
+            {
+                "move_type": "in_invoice",
+                "partner_id": vendor.id,
+                "invoice_date": date.today(),
+                "realestate_expense_category": "cleaning",
+                "realestate_expense_building_id": self.building.id,
+                "invoice_line_ids": [
+                    (
+                        0,
+                        0,
+                        {
+                            "name": "Common area cleaning",
+                            "product_id": self.product.id,
+                            "quantity": 1.0,
+                            "price_unit": 300,
+                        },
+                    )
+                ],
+            }
+        )
+
+        income_line = self.env["realestate.financial.report"].search(
+            [("move_id", "=", invoice.id), ("line_type", "=", "income")],
+            limit=1,
+        )
+        expense_line = self.env["realestate.financial.report"].search(
+            [("move_id", "=", bill.id), ("line_type", "=", "expense")],
+            limit=1,
+        )
+
+        self.assertEqual(income_line.building_id, self.building)
+        self.assertEqual(income_line.unit_id, self.unit)
+        self.assertEqual(income_line.tenant_id, self.tenant)
+        self.assertEqual(income_line.amount, invoice.amount_total_signed)
+        self.assertEqual(expense_line.building_id, self.building)
+        self.assertEqual(expense_line.expense_category, "cleaning")
+        self.assertEqual(expense_line.amount, -300)
+
+    def test_report_actions_are_registered(self):
+        report_actions = {
+            "realestate.action_realestate_rent_collection_report": "account.move",
+            "realestate.action_realestate_rent_due_report": "account.move",
+            "realestate.action_realestate_tenant_outstanding_report": "account.move",
+            "realestate.action_realestate_building_income_report": "realestate.financial.report",
+            "realestate.action_realestate_profit_analysis_report": "realestate.financial.report",
+            "realestate.action_realestate_vat_report": "account.move",
+        }
+        for xmlid, model in report_actions.items():
+            action = self.env.ref(xmlid)
+            self.assertEqual(action.res_model, model)

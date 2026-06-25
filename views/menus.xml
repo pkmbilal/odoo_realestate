@@ -15,7 +15,13 @@
     <menuitem id="menu_realestate_expenses" name="Expenses" parent="menu_realestate_root" action="action_realestate_expense_bill" sequence="40"/>
     <menuitem id="menu_realestate_reports" name="Reports" parent="menu_realestate_root" sequence="50"/>
     <menuitem id="menu_realestate_invoices" name="Rent Invoices" parent="menu_realestate_root" action="action_realestate_invoice" sequence="60"/>
-    <menuitem id="menu_realestate_expense_analysis" name="Expense Analysis" parent="menu_realestate_reports" action="action_realestate_expense_report" sequence="10"/>
+    <menuitem id="menu_realestate_rent_collection" name="Rent Collection" parent="menu_realestate_reports" action="action_realestate_rent_collection_report" sequence="10"/>
+    <menuitem id="menu_realestate_rent_due" name="Rent Due / Overdue" parent="menu_realestate_reports" action="action_realestate_rent_due_report" sequence="20"/>
+    <menuitem id="menu_realestate_building_income" name="Building Income" parent="menu_realestate_reports" action="action_realestate_building_income_report" sequence="30"/>
+    <menuitem id="menu_realestate_tenant_outstanding" name="Tenant Outstanding" parent="menu_realestate_reports" action="action_realestate_tenant_outstanding_report" sequence="40"/>
+    <menuitem id="menu_realestate_expense_analysis" name="Expense Analysis" parent="menu_realestate_reports" action="action_realestate_expense_report" sequence="50"/>
+    <menuitem id="menu_realestate_profit_analysis" name="Profit Analysis" parent="menu_realestate_reports" action="action_realestate_profit_analysis_report" sequence="60"/>
+    <menuitem id="menu_realestate_vat_report" name="VAT Handoff" parent="menu_realestate_reports" action="action_realestate_vat_report" sequence="70"/>
     <menuitem id="menu_realestate_configuration" name="Configuration" parent="menu_realestate_root" sequence="90" groups="realestate.group_realestate_manager"/>
     <menuitem id="menu_realestate_floors" name="Floors" parent="menu_realestate_configuration" action="action_realestate_floor" sequence="10"/>
     <menuitem id="menu_realestate_rent_products" name="Rent Products" parent="menu_realestate_configuration" action="action_realestate_rent_product" sequence="20"/>

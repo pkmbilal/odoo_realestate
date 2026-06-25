@@ -1,0 +1,197 @@
+<odoo>
+    <record id="view_realestate_rent_invoice_search" model="ir.ui.view">
+        <field name="name">account.move.search.realestate.rent.report</field>
+        <field name="model">account.move</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="realestate_contract_id"/>
+                <field name="rental_period_start"/>
+                <field name="rental_period_end"/>
+                <filter string="Posted" name="posted" domain="[('state', '=', 'posted')]"/>
+                <filter string="Unpaid" name="unpaid" domain="[('payment_state', '!=', 'paid')]"/>
+                <filter string="Paid" name="paid" domain="[('payment_state', '=', 'paid')]"/>
+                <filter string="Overdue" name="overdue" domain="[('payment_state', '!=', 'paid'), ('invoice_date_due', '&lt;', context_today().strftime('%Y-%m-%d'))]"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_tenant" string="Tenant" context="{'group_by': 'partner_id'}"/>
+                    <filter name="group_contract" string="Contract" context="{'group_by': 'realestate_contract_id'}"/>
+                    <filter name="group_invoice_month" string="Invoice Month" context="{'group_by': 'invoice_date:month'}"/>
+                    <filter name="group_due_month" string="Due Month" context="{'group_by': 'invoice_date_due:month'}"/>
+                    <filter name="group_payment_state" string="Payment Status" context="{'group_by': 'payment_state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="view_realestate_rent_collection_graph" model="ir.ui.view">
+        <field name="name">account.move.graph.realestate.rent.collection</field>
+        <field name="model">account.move</field>
+        <field name="arch" type="xml">
+            <graph string="Rent Collection" type="bar">
+                <field name="invoice_date" type="row" interval="month"/>
+                <field name="payment_state" type="col"/>
+                <field name="amount_total_signed" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="view_realestate_rent_collection_pivot" model="ir.ui.view">
+        <field name="name">account.move.pivot.realestate.rent.collection</field>
+        <field name="model">account.move</field>
+        <field name="arch" type="xml">
+            <pivot string="Rent Collection">
+                <field name="invoice_date" interval="month" type="row"/>
+                <field name="payment_state" type="col"/>
+                <field name="amount_total_signed" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="view_realestate_tenant_outstanding_pivot" model="ir.ui.view">
+        <field name="name">account.move.pivot.realestate.tenant.outstanding</field>
+        <field name="model">account.move</field>
+        <field name="arch" type="xml">
+            <pivot string="Tenant Outstanding">
+                <field name="partner_id" type="row"/>
+                <field name="invoice_date_due" interval="month" type="col"/>
+                <field name="amount_residual_signed" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="view_realestate_vat_pivot" model="ir.ui.view">
+        <field name="name">account.move.pivot.realestate.vat</field>
+        <field name="model">account.move</field>
+        <field name="arch" type="xml">
+            <pivot string="VAT Handoff">
+                <field name="invoice_date" interval="month" type="row"/>
+                <field name="amount_untaxed_signed" type="measure"/>
+                <field name="amount_tax_signed" type="measure"/>
+                <field name="amount_total_signed" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="view_realestate_financial_report_search" model="ir.ui.view">
+        <field name="name">realestate.financial.report.search</field>
+        <field name="model">realestate.financial.report</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="building_id"/>
+                <field name="unit_id"/>
+                <field name="tenant_id"/>
+                <field name="partner_id"/>
+                <filter string="Income" name="income" domain="[('line_type', '=', 'income')]"/>
+                <filter string="Expenses" name="expense" domain="[('line_type', '=', 'expense')]"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_building" string="Building" context="{'group_by': 'building_id'}"/>
+                    <filter name="group_unit" string="Unit" context="{'group_by': 'unit_id'}"/>
+                    <filter name="group_type" string="Type" context="{'group_by': 'line_type'}"/>
+                    <filter name="group_category" string="Expense Category" context="{'group_by': 'expense_category'}"/>
+                    <filter name="group_month" string="Month" context="{'group_by': 'date:month'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="view_realestate_financial_report_tree" model="ir.ui.view">
+        <field name="name">realestate.financial.report.tree</field>
+        <field name="model">realestate.financial.report</field>
+        <field name="arch" type="xml">
+            <tree create="false" edit="false" delete="false" decoration-success="line_type == 'income'" decoration-danger="line_type == 'expense'">
+                <field name="date"/>
+                <field name="line_type" widget="badge"/>
+                <field name="building_id"/>
+                <field name="unit_id"/>
+                <field name="tenant_id"/>
+                <field name="partner_id"/>
+                <field name="expense_category"/>
+                <field name="amount"/>
+                <field name="currency_id" optional="show"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_realestate_financial_report_graph" model="ir.ui.view">
+        <field name="name">realestate.financial.report.graph</field>
+        <field name="model">realestate.financial.report</field>
+        <field name="arch" type="xml">
+            <graph string="Profit Analysis" type="bar">
+                <field name="building_id" type="row"/>
+                <field name="line_type" type="col"/>
+                <field name="amount" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="view_realestate_financial_report_pivot" model="ir.ui.view">
+        <field name="name">realestate.financial.report.pivot</field>
+        <field name="model">realestate.financial.report</field>
+        <field name="arch" type="xml">
+            <pivot string="Profit Analysis">
+                <field name="building_id" type="row"/>
+                <field name="line_type" type="col"/>
+                <field name="amount" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="action_realestate_rent_collection_report" model="ir.actions.act_window">
+        <field name="name">Rent Collection</field>
+        <field name="res_model">account.move</field>
+        <field name="view_mode">graph,pivot,tree,form</field>
+        <field name="view_id" ref="view_realestate_rent_collection_graph"/>
+        <field name="search_view_id" ref="view_realestate_rent_invoice_search"/>
+        <field name="domain">[('realestate_contract_id', '!=', False), ('move_type', 'in', ('out_invoice', 'out_refund')), ('state', '!=', 'cancel')]</field>
+        <field name="context">{'search_default_posted': 1}</field>
+    </record>
+
+    <record id="action_realestate_rent_due_report" model="ir.actions.act_window">
+        <field name="name">Rent Due / Overdue</field>
+        <field name="res_model">account.move</field>
+        <field name="view_mode">tree,pivot,graph,form</field>
+        <field name="search_view_id" ref="view_realestate_rent_invoice_search"/>
+        <field name="domain">[('realestate_contract_id', '!=', False), ('move_type', '=', 'out_invoice'), ('payment_state', '!=', 'paid'), ('state', '!=', 'cancel')]</field>
+        <field name="context">{'search_default_unpaid': 1}</field>
+    </record>
+
+    <record id="action_realestate_tenant_outstanding_report" model="ir.actions.act_window">
+        <field name="name">Tenant Outstanding</field>
+        <field name="res_model">account.move</field>
+        <field name="view_mode">pivot,tree,form</field>
+        <field name="view_id" ref="view_realestate_tenant_outstanding_pivot"/>
+        <field name="search_view_id" ref="view_realestate_rent_invoice_search"/>
+        <field name="domain">[('realestate_contract_id', '!=', False), ('move_type', '=', 'out_invoice'), ('payment_state', '!=', 'paid'), ('state', '!=', 'cancel')]</field>
+        <field name="context">{'search_default_unpaid': 1, 'search_default_group_tenant': 1}</field>
+    </record>
+
+    <record id="action_realestate_building_income_report" model="ir.actions.act_window">
+        <field name="name">Building Income</field>
+        <field name="res_model">realestate.financial.report</field>
+        <field name="view_mode">graph,pivot,tree</field>
+        <field name="view_id" ref="view_realestate_financial_report_graph"/>
+        <field name="search_view_id" ref="view_realestate_financial_report_search"/>
+        <field name="domain">[('line_type', '=', 'income')]</field>
+        <field name="context">{'search_default_income': 1, 'search_default_group_building': 1}</field>
+    </record>
+
+    <record id="action_realestate_profit_analysis_report" model="ir.actions.act_window">
+        <field name="name">Profit Analysis</field>
+        <field name="res_model">realestate.financial.report</field>
+        <field name="view_mode">graph,pivot,tree</field>
+        <field name="view_id" ref="view_realestate_financial_report_graph"/>
+        <field name="search_view_id" ref="view_realestate_financial_report_search"/>
+        <field name="context">{'search_default_group_building': 1}</field>
+    </record>
+
+    <record id="action_realestate_vat_report" model="ir.actions.act_window">
+        <field name="name">VAT Handoff</field>
+        <field name="res_model">account.move</field>
+        <field name="view_mode">pivot,tree,form</field>
+        <field name="view_id" ref="view_realestate_vat_pivot"/>
+        <field name="search_view_id" ref="view_realestate_rent_invoice_search"/>
+        <field name="domain">[('realestate_contract_id', '!=', False), ('move_type', 'in', ('out_invoice', 'out_refund')), ('state', '=', 'posted')]</field>
+        <field name="context">{'search_default_posted': 1}</field>
+    </record>
+</odoo>

@@ -47,4 +47,10 @@
         <field name="domain_force">[('company_id', 'in', company_ids)]</field>
         <field name="groups" eval="[(4, ref('realestate.group_realestate_user'))]"/>
     </record>
+    <record id="financial_report_company_rule" model="ir.rule">
+        <field name="name">Financial reports by company</field>
+        <field name="model_id" ref="model_realestate_financial_report"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+        <field name="groups" eval="[(4, ref('realestate.group_realestate_user'))]"/>
+    </record>
 </odoo>
