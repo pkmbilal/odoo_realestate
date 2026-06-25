@@ -1,0 +1,43 @@
+<odoo>
+    <record id="view_realestate_report_export_wizard_form" model="ir.ui.view">
+        <field name="name">realestate.report.export.wizard.form</field>
+        <field name="model">realestate.report.export.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Export Reports">
+                <sheet>
+                    <group>
+                        <group string="Report">
+                            <field name="report_type"/>
+                            <field name="date_from"/>
+                            <field name="date_to"/>
+                        </group>
+                        <group string="Filters">
+                            <field name="building_id"/>
+                            <field name="unit_id"/>
+                            <field name="tenant_id"/>
+                        </group>
+                    </group>
+                </sheet>
+                <footer>
+                    <button name="action_print_pdf" type="object" string="Print PDF" class="oe_highlight"/>
+                    <button name="action_export_excel" type="object" string="Export Excel" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_realestate_report_export_wizard" model="ir.actions.act_window">
+        <field name="name">Export Reports</field>
+        <field name="res_model">realestate.report.export.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_realestate_report_export_wizard_form"/>
+        <field name="target">new</field>
+    </record>
+
+    <menuitem id="menu_realestate_report_export"
+        name="Export Reports"
+        parent="menu_realestate_reports"
+        action="action_realestate_report_export_wizard"
+        sequence="5"/>
+</odoo>

@@ -1,0 +1,77 @@
+<odoo>
+    <record id="action_report_realestate_export_pdf" model="ir.actions.report">
+        <field name="name">Real Estate Report</field>
+        <field name="model">realestate.report.export.wizard</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">realestate.report_realestate_export_pdf</field>
+        <field name="report_file">realestate.report_realestate_export_pdf</field>
+        <field name="binding_model_id" ref="model_realestate_report_export_wizard"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <template id="report_realestate_export_pdf">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <h2 t-out="doc._get_report_title()"/>
+                        <p>
+                            <strong>Company:</strong>
+                            <span t-out="doc.env.company.display_name"/>
+                        </p>
+                        <p>
+                            <strong>Filters:</strong>
+                            <span t-out="', '.join(doc._get_filter_summary())"/>
+                        </p>
+                        <table class="table table-sm table-bordered">
+                            <thead>
+                                <tr>
+                                    <t t-foreach="doc._get_report_columns()" t-as="column">
+                                        <th t-out="column[1]"/>
+                                    </t>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-set="lines" t-value="doc._get_report_lines()"/>
+                                <t t-if="not lines">
+                                    <tr>
+                                        <td t-att-colspan="len(doc._get_report_columns())">No data found.</td>
+                                    </tr>
+                                </t>
+                                <t t-foreach="lines" t-as="line">
+                                    <tr>
+                                        <t t-foreach="doc._get_report_columns()" t-as="column">
+                                            <td>
+                                                <t t-if="column[2] == 'amount'">
+                                                    <span t-out="'{:,.2f}'.format(line.get(column[0]) or 0.0)"/>
+                                                </t>
+                                                <t t-else="">
+                                                    <span t-out="line.get(column[0]) or ''"/>
+                                                </t>
+                                            </td>
+                                        </t>
+                                    </tr>
+                                </t>
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td>
+                                        <strong>Total</strong>
+                                    </td>
+                                    <t t-set="columns" t-value="doc._get_report_columns()"/>
+                                    <t t-foreach="columns[1:]" t-as="column">
+                                        <td>
+                                            <t t-if="column[2] == 'amount'">
+                                                <strong t-out="'{:,.2f}'.format(sum(line.get(column[0]) or 0.0 for line in lines))"/>
+                                            </t>
+                                        </td>
+                                    </t>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

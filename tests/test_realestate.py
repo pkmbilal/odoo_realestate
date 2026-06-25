@@ -1,4 +1,6 @@
 from datetime import date
+import io
+import zipfile
 
 from dateutil.relativedelta import relativedelta
 
@@ -16,7 +18,9 @@ class TestRealestate(TransactionCase):
             {"name": "Unit 101", "code": "NT-101", "building_id": cls.building.id, "floor_id": cls.floor.id, "rent_amount": 1200, "deposit_amount": 500}
         )
         cls.tenant = cls.env["res.partner"].create({"name": "Test Tenant", "is_tenant": True})
-        cls.product = cls.env["product.product"].create({"name": "Residential Rent", "detailed_type": "service"})
+        cls.product = cls.env["product.product"].search([("detailed_type", "=", "service")], limit=1)
+        if not cls.product:
+            cls.product = cls.env["product.product"].create({"name": "Residential Rent", "detailed_type": "service"})
         cls.sar = cls.env.ref("base.SAR")
         cls.residential_tax = cls.env["account.tax"].create(
             {
@@ -498,3 +502,50 @@ class TestRealestate(TransactionCase):
         for xmlid, model in report_actions.items():
             action = self.env.ref(xmlid)
             self.assertEqual(action.res_model, model)
+
+    def test_report_export_wizard_actions_are_registered(self):
+        action = self.env.ref("realestate.action_realestate_report_export_wizard")
+        pdf_action = self.env.ref("realestate.action_report_realestate_export_pdf")
+
+        self.assertEqual(action.res_model, "realestate.report.export.wizard")
+        self.assertEqual(action.target, "new")
+        self.assertEqual(pdf_action.model, "realestate.report.export.wizard")
+        self.assertEqual(pdf_action.report_type, "qweb-pdf")
+
+    def test_report_export_wizard_generates_pdf_action_and_xlsx(self):
+        contract = self._create_contract()
+        contract.action_activate()
+        invoice_action = contract.action_create_invoice()
+        self.env["account.move"].browse(invoice_action["res_id"]).invoice_date = date(2026, 1, 1)
+        wizard = self.env["realestate.report.export.wizard"].create(
+            {
+                "report_type": "rent_collection",
+                "date_from": date(2026, 1, 1),
+                "date_to": date(2026, 1, 31),
+                "building_id": self.building.id,
+                "tenant_id": self.tenant.id,
+            }
+        )
+
+        lines = wizard._get_report_lines()
+        pdf_action = wizard.action_print_pdf()
+        xlsx_content = wizard._generate_xlsx()
+
+        self.assertEqual(len(lines), 1)
+        self.assertEqual(lines[0]["tenant"], self.tenant.display_name)
+        self.assertIn(pdf_action["type"], ("ir.actions.report", "ir.actions.act_window"))
+        if pdf_action["type"] == "ir.actions.act_window":
+            self.assertEqual(pdf_action["context"]["report_action"]["type"], "ir.actions.report")
+        self.assertTrue(zipfile.is_zipfile(io.BytesIO(xlsx_content)))
+
+    def test_report_export_wizard_rejects_invalid_date_range(self):
+        wizard = self.env["realestate.report.export.wizard"].create(
+            {
+                "report_type": "rent_collection",
+                "date_from": date(2026, 2, 1),
+                "date_to": date(2026, 1, 1),
+            }
+        )
+
+        with self.assertRaises(UserError):
+            wizard.action_print_pdf()

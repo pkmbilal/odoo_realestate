@@ -6,3 +6,4 @@ from . import dashboard
 from . import account_move
 from . import res_company
 from . import financial_report
+from . import report_export_wizard

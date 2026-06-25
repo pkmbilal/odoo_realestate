@@ -23,6 +23,8 @@
         "views/report_views.xml",
         "views/res_config_settings_views.xml",
         "views/menus.xml",
+        "views/report_export_views.xml",
+        "reports/report_export_templates.xml",
     ],
     "assets": {
         "web.assets_backend": [
