@@ -23,10 +23,13 @@ class RealestateDashboard(models.Model):
     active_contract_count = fields.Integer(compute="_compute_metrics")
     invoice_due_count = fields.Integer(compute="_compute_metrics")
     invoice_overdue_count = fields.Integer(compute="_compute_metrics")
+    expense_bill_count = fields.Integer(compute="_compute_metrics")
+    expense_month_total = fields.Monetary(compute="_compute_metrics", currency_field="currency_id")
 
     @api.depends("company_id")
     def _compute_metrics(self):
         today = fields.Date.context_today(self)
+        month_start = today.replace(day=1)
         Building = self.env["realestate.building"]
         Floor = self.env["realestate.floor"]
         Unit = self.env["realestate.unit"]
@@ -50,6 +53,16 @@ class RealestateDashboard(models.Model):
                 ("realestate_contract_id", "!=", False),
                 ("state", "!=", "cancel"),
             ]
+            expense_domain = [
+                ("company_id", "=", dashboard.company_id.id),
+                ("move_type", "in", ("in_invoice", "in_refund")),
+                ("state", "!=", "cancel"),
+                "|",
+                "|",
+                ("realestate_expense_category", "!=", False),
+                ("realestate_expense_building_id", "!=", False),
+                ("realestate_expense_unit_id", "!=", False),
+            ]
 
             dashboard.building_count = Building.search_count(company_domain)
             dashboard.floor_count = Floor.search_count(company_domain)
@@ -61,6 +74,16 @@ class RealestateDashboard(models.Model):
             )
             dashboard.tenant_count = Partner.search_count(partner_domain)
             dashboard.active_contract_count = Contract.search_count(company_domain + [("state", "=", "active")])
+            dashboard.expense_bill_count = Move.search_count(expense_domain)
+
+            expense_groups = Move.read_group(
+                expense_domain + [("invoice_date", ">=", month_start), ("invoice_date", "<=", today)],
+                ["realestate_expense_amount:sum"],
+                [],
+            )
+            dashboard.expense_month_total = (
+                expense_groups[0].get("realestate_expense_amount_sum", 0.0) if expense_groups else 0.0
+            )
 
             due = 0
             overdue = 0
@@ -203,6 +226,34 @@ class RealestateDashboard(models.Model):
         )
         action["menu_id"] = self.env.ref("realestate.menu_realestate_invoices").id
         return action
+
+    def action_open_expenses(self):
+        self.ensure_one()
+        return self._open_action(
+            "realestate.action_realestate_expense_bill",
+            [
+                ("company_id", "=", self.company_id.id),
+                ("move_type", "in", ("in_invoice", "in_refund")),
+            ],
+            {"default_move_type": "in_invoice"},
+        )
+
+    def action_open_expense_reports(self):
+        self.ensure_one()
+        return self._open_action(
+            "realestate.action_realestate_expense_report",
+            [
+                ("company_id", "=", self.company_id.id),
+                ("move_type", "in", ("in_invoice", "in_refund")),
+                ("state", "!=", "cancel"),
+                "|",
+                "|",
+                ("realestate_expense_category", "!=", False),
+                ("realestate_expense_building_id", "!=", False),
+                ("realestate_expense_unit_id", "!=", False),
+            ],
+            {"search_default_realestate_expense_tagged": 1},
+        )
 
     def action_open_settings(self):
         self.ensure_one()

@@ -57,6 +57,8 @@ class RealestateDashboardAction extends Component {
                 "active_contract_count",
                 "invoice_due_count",
                 "invoice_overdue_count",
+                "expense_bill_count",
+                "expense_month_total",
             ]);
             this.state.dashboard = dashboard;
         } catch (error) {
@@ -136,6 +138,14 @@ class RealestateDashboardAction extends Component {
 
     openOverdueInvoices() {
         return this._runDashboardAction("action_open_overdue_invoices");
+    }
+
+    openExpenses() {
+        return this._runDashboardAction("action_open_expenses");
+    }
+
+    openExpenseReports() {
+        return this._runDashboardAction("action_open_expense_reports");
     }
 
     openSettings() {

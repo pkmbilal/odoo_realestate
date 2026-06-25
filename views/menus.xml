@@ -12,7 +12,10 @@
     <menuitem id="menu_realestate_units" name="Units" parent="menu_realestate_properties" action="action_realestate_unit" sequence="20"/>
     <menuitem id="menu_realestate_tenants" name="Tenants" parent="menu_realestate_root" action="action_realestate_tenant" sequence="20"/>
     <menuitem id="menu_realestate_contracts" name="Contracts" parent="menu_realestate_root" action="action_realestate_contract" sequence="30"/>
-    <menuitem id="menu_realestate_invoices" name="Invoices" parent="menu_realestate_root" action="action_realestate_invoice" sequence="40"/>
+    <menuitem id="menu_realestate_expenses" name="Expenses" parent="menu_realestate_root" action="action_realestate_expense_bill" sequence="40"/>
+    <menuitem id="menu_realestate_reports" name="Reports" parent="menu_realestate_root" sequence="50"/>
+    <menuitem id="menu_realestate_invoices" name="Rent Invoices" parent="menu_realestate_root" action="action_realestate_invoice" sequence="60"/>
+    <menuitem id="menu_realestate_expense_analysis" name="Expense Analysis" parent="menu_realestate_reports" action="action_realestate_expense_report" sequence="10"/>
     <menuitem id="menu_realestate_configuration" name="Configuration" parent="menu_realestate_root" sequence="90" groups="realestate.group_realestate_manager"/>
     <menuitem id="menu_realestate_floors" name="Floors" parent="menu_realestate_configuration" action="action_realestate_floor" sequence="10"/>
     <menuitem id="menu_realestate_rent_products" name="Rent Products" parent="menu_realestate_configuration" action="action_realestate_rent_product" sequence="20"/>
